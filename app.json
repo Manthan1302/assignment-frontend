@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "taskify_frontend",
+    "slug": "taskify_frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./images/Taskifylogo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./images/splashScreen.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#E90064"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -22,12 +22,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./images/Taskifylogo.png",
+        "backgroundColor": "#E90064"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./images/Taskifylogo.png"
     }
   }
 }

@@ -8,11 +8,13 @@ import UserHomeScreen from "./screens/UserHomeScreen";
 import AdminScreen from "./screens/AdminScreen";
 import ClientSignupScreen from "./screens/ClientSignupScreen";
 import UserSignupScreen from "./screens/UserSignupScreen";
+import OnboardScreen from "./screens/OnboardingScreen";
 const Stack = createNativeStackNavigator();
 const MainApp = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+        <Stack.Screen name="Onboard" component={OnboardScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignUpScreen} />
         <Stack.Screen name="ClientServices" component={ClientHomeScreen} />

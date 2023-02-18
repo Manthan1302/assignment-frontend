@@ -26,7 +26,9 @@ const OnboardScreen = () => {
           padding: 13,
         }}
       >
-        <Text style={{ fontSize: 14, fontWeight: "600" }}>{label}</Text>
+        <Text style={{ fontSize: 14, fontWeight: "600", color: "white" }}>
+          {label}
+        </Text>
       </View>
     );
   };
@@ -47,23 +49,21 @@ const OnboardScreen = () => {
   const slides = [
     {
       id: 1,
-      title: "Discover Service Provider near you",
-      description:
-        "Services like Carpenting , Plumbing , Painting etc  in this app at your door step!",
-      image: require("../images/slide1.gif"),
+      title: "Assignments! , get it done!",
+      description: "Want your assignments done , just place a task! ",
+      image: require("../images/image1.gif"),
     },
     {
       id: 2,
-      title: "Become a Service Provider",
-      description:
-        "Provide your services through our application and generate revenue.",
-      image: require("../images/slide2.gif"),
+      title: "Become an Assignment writter",
+      description: "Put your skills into the right place! and earn revenue",
+      image: require("../images/image2.gif"),
     },
     {
       id: 3,
       title: "Pay Per Use",
-      description: "Just Book our Services and pay after the work is done. ",
-      image: require("../images/slide3.gif"),
+      description: "Just Book our Taskies and pay after the work is done. ",
+      image: require("../images/image3.gif"),
     },
   ];
 
@@ -72,7 +72,7 @@ const OnboardScreen = () => {
       <AppIntroSlider
         data={slides}
         style={{
-          backgroundColor: "#B9F3FC",
+          backgroundColor: "#E90064",
         }}
         renderItem={({ item }) => {
           return (
@@ -95,20 +95,22 @@ const OnboardScreen = () => {
                 <Text
                   style={{
                     fontWeight: "bold",
-                    fontSize: 20,
+                    fontSize: 22,
                     // backgroundColor: "white",
                     marginTop: 30,
+                    color: "white",
                   }}
                 >
                   {item.title}
                 </Text>
                 <Text
                   style={{
-                    fontSize: 16,
+                    fontSize: 17,
                     // backgroundColor: "white",
                     marginTop: 30,
                     width: 250,
                     textAlign: "center",
+                    color: "white",
                   }}
                 >
                   {item.description}
