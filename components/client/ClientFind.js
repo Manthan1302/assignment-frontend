@@ -17,7 +17,7 @@ import { Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { UserIcon, UserGroupIcon } from "react-native-heroicons/outline";
 
-const UserMain = () => {
+const ClientFind = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -46,15 +46,11 @@ const UserMain = () => {
     });
   }, []);
 
-  const getAssignments = () => {
-    
-  }
-
   return (
     <SafeAreaView>
-      <Text>User home screen</Text>
+      <Text>Client find screen</Text>
     </SafeAreaView>
   );
 };
 
-export default UserMain;
+export default ClientFind;

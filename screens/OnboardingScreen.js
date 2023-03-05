@@ -129,7 +129,7 @@ const OnboardScreen = () => {
         renderSkipButton={() => buttonLabel("Skip")}
         renderDoneButton={() => buttonLabel("Get Started")}
         onDone={() => navigation.navigate("Login")}
-        onSkip={() => navigation.navigate("Home")}
+        onSkip={() => navigation.navigate("UserNav")}
       />
     );
   }

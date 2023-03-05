@@ -7,17 +7,23 @@ import {
   Image,
   Alert,
   BackHandler,
-  TouchableOpacity,
   ToastAndroid,
   KeyboardAvoidingView,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
+import login from "../images/loginanimation.jpg";
 import { Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { UserIcon, UserGroupIcon } from "react-native-heroicons/outline";
+import { loginServices } from "../services/oneForAll";
+import { useDispatch } from "react-redux";
+import { userData } from "../services/UserData.reducer";
+import { clientData } from "../services/ClientData.reducer";
+import { adminData } from "../services/AdminData.reducer";
 
-const UserMain = () => {
+const Home = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -46,15 +52,11 @@ const UserMain = () => {
     });
   }, []);
 
-  const getAssignments = () => {
-    
-  }
-
   return (
     <SafeAreaView>
-      <Text>User home screen</Text>
+      <Text>Home screen</Text>
     </SafeAreaView>
   );
 };
 
-export default UserMain;
+export default Home;

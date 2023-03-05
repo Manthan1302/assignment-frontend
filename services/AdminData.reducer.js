@@ -4,15 +4,25 @@ const adminDataSlice = createSlice({
   name: "admindata-storage",
   initialState: {
     _id: "",
-    name: "",
     email: "",
-    type: "",
+    usertype: "",
     token: "",
   },
 
   reducers: {
     adminData: (state, action) => {
       console.log("action: ", action);
+
+      const { actor, token } = action.payload;
+      console.log("actor: ", actor);
+
+      const { _id, email, usertype } = actor;
+
+      state.token = token;
+
+      state._id = _id;
+      state.email = email;
+      state.usertype = usertype;
     },
   },
 });

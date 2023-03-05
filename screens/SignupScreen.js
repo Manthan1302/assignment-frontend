@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
-import signup from "../images/loginanimation.jpg";
 import signupvector from "../images/signupvector.jpg";
 import { Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";

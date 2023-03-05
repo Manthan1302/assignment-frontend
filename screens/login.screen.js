@@ -10,6 +10,7 @@ import {
   ToastAndroid,
   KeyboardAvoidingView,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -79,11 +80,18 @@ const Login = ({ history }) => {
       const reply = await loginServices(logUser);
 
       const { response, error } = reply;
+      console.log(
+        "==========================================================================="
+      );
+      console.log("response: ", response);
 
       if (response) {
         const { token, actor } = response;
+        console.log(
+          "==========================================================================="
+        );
         console.log("actor:", actor);
-        console.log(" response:", response);
+
         setLoader(false);
         setLogUser({
           email: "",
@@ -97,11 +105,21 @@ const Login = ({ history }) => {
         );
 
         if (actor.usertype === "user") {
-          dispatch(userData({ actor, token }));
-          navigation.navigate("UserServices");
+          const user = actor;
+          console.log(
+            "==========================================================================="
+          );
+          console.log("user ln 103: ", user);
+          dispatch(userData({ user, token }));
+          navigation.navigate("UserNav");
         } else if (actor.usertype === "client") {
-          dispatch(clientData({ actor, token }));
-          navigation.navigate("ClientServices");
+          const client = actor;
+          console.log(
+            "==========================================================================="
+          );
+          console.log("client ln 108: ", client);
+          dispatch(clientData({ client, token }));
+          navigation.navigate("ClientNav");
         } else if (actor.usertype === "admin") {
           dispatch(adminData({ actor, token }));
           navigation.navigate("theOwnerAdmin");
@@ -115,6 +133,7 @@ const Login = ({ history }) => {
         );
         setLoader(false);
       }
+      setLogUser({ email: "", password: "" });
     }
   };
 
@@ -130,6 +149,7 @@ const Login = ({ history }) => {
     } else {
       const reply = await loginServices(logUser);
       const { response, error } = reply;
+      console.log("response: ", response);
 
       if (response) {
         const { token, user } = response;
@@ -145,16 +165,8 @@ const Login = ({ history }) => {
 
         alert(`Sign in Successfull!`);
 
-        if (user.type === "user") {
-          dispatch(userData({ actor, token }));
-          navigation.navigate("UserServices");
-        } else if (user.type === "client") {
-          dispatch(clientData({ actor, token }));
-          navigation.navigate("ClientServices");
-        } else if (user.type === "admin") {
-          dispatch(adminData({ actor, token }));
-          navigation.navigate("theOwnerAdmin");
-        }
+        dispatch(adminData({ actor, token }));
+        navigation.navigate("theOwnerAdmin");
       } else if (error) {
         console.log("🚀 ~ file: login.screen.js:105 ~ signin ~ error", error);
         ToastAndroid.show(
@@ -197,6 +209,7 @@ const Login = ({ history }) => {
             <TextInput
               style={[styles.container, styles.center]}
               onChangeText={(text) => setFields(text, "email")}
+              value={logUser.email}
             />
             <Text>{"\n"}</Text>
             <Text style={styles.texts}>Password</Text>
@@ -204,14 +217,27 @@ const Login = ({ history }) => {
               style={[styles.container, styles.center]}
               secureTextEntry={true}
               onChangeText={(text) => setFields(text, "password")}
+              value={logUser.password}
             />
             <Text>{"\n"}</Text>
             <View style={styles.center}>
-              <Text style={styles.signin} onPress={() => signin()}>
-                {" "}
-                Sign In
-              </Text>
-              <Text>{"\n"}</Text>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#E90064",
+                  height: 47,
+                  borderRadius: 5,
+                  flex: 0.5,
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                }}
+                onPress={() => signin()}
+              >
+                {onLoad ? (
+                  <ActivityIndicator size={30} color={"white"} />
+                ) : (
+                  <Text style={{ color: "white" }}>SIGN IN</Text>
+                )}
+              </TouchableOpacity>
               <Text style={{ textAlign: "center", fontSize: 17 }}>
                 forgot password?
               </Text>
@@ -236,7 +262,7 @@ const Login = ({ history }) => {
     );
   } else {
     return (
-      <div style={{ display: "flex", backgroundColor: "#4340ab" }}>
+      <div style={{ display: "flex", backgroundColor: "#FCC2FC" }}>
         <div>
           <img src={login} style={{ height: 735, flex: 50 }}></img>
         </div>
@@ -268,22 +294,33 @@ const Login = ({ history }) => {
               placeholder="Enter Password.."
               style={{ height: 30, width: 250, borderRadius: 7 }}
               onChangeText={(text) => setFields(text, "password")}
+              secureTextEntry={true}
             />
             <br></br>
             <br></br>
             <br></br>
-            <button
+            <TouchableOpacity
               style={{
                 width: 150,
                 height: 35,
-                borderRadius: 7,
-                backgroundColor: "#fff",
-                color: "000000",
+
+                borderRadius: 5,
+
+                outline: "none",
+                backgroundColor: "white",
+                cursor: "pointer",
+                display: "flex",
+                justifyContent: "space-around",
+                alignItems: "center",
               }}
               onPress={() => signInweb()}
             >
-              Login
-            </button>
+              {onLoad ? (
+                <ActivityIndicator size={10} color={"#E90064"} />
+              ) : (
+                <Text style={{ color: "#E90064", fontSize: 15 }}>Login</Text>
+              )}
+            </TouchableOpacity>
           </div>
         </div>
       </div>
