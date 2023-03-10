@@ -25,6 +25,8 @@ import {
   CreditCardIcon,
   BanknotesIcon,
   NewspaperIcon,
+  InformationCircleIcon,
+  QuestionMarkCircleIcon,
 } from "react-native-heroicons/outline";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import UserMain from "./UserHomeRootComponent";
@@ -416,7 +418,7 @@ const UserSetting = () => {
                 flexDirection: "row",
               }}
             >
-              <ClipboardDocumentListIcon
+              <InformationCircleIcon
                 size={30}
                 color={"#E90064"}
                 style={{ paddingLeft: 60, paddingRight: 60 }}
@@ -437,7 +439,7 @@ const UserSetting = () => {
                 flexDirection: "row",
               }}
             >
-              <BellAlertIcon
+              <UserGroupIcon
                 size={30}
                 color={"#E90064"}
                 style={{ paddingLeft: 60, paddingRight: 60 }}
@@ -458,7 +460,7 @@ const UserSetting = () => {
                 flexDirection: "row",
               }}
             >
-              <CreditCardIcon
+              <QuestionMarkCircleIcon
                 size={30}
                 color={"#E90064"}
                 style={{ paddingLeft: 60, paddingRight: 60 }}

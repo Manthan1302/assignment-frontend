@@ -81,3 +81,20 @@ export const signUpClientServices = async (data) => {
     return { error };
   }
 };
+
+export const getAllAssingmentServices = async () => {
+  console.log("------------------------------");
+  const url = "/visitorsAssigments";
+  const link = host + url;
+
+  try {
+    const response = await axios.get(link);
+
+    const theData = response.data.allAssignments;
+
+    return { theData };
+  } catch (error) {
+    console.log("error:", error);
+    return { error };
+  }
+};
