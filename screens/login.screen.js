@@ -22,6 +22,7 @@ import { useDispatch } from "react-redux";
 import { userData } from "../services/UserData.reducer";
 import { clientData } from "../services/ClientData.reducer";
 import { adminData } from "../services/AdminData.reducer";
+import { EyeIcon, EyeSlashIcon } from "react-native-heroicons/outline";
 
 const Login = ({ history }) => {
   const [logUser, setLogUser] = useState({
@@ -30,7 +31,7 @@ const Login = ({ history }) => {
   });
 
   const [onLoad, setLoader] = useState(false);
-  const [showpwd, setShowPwd] = useState(false);
+  const [showPwd, setShowPwd] = useState(true);
   const dispatch = useDispatch();
 
   // navigation
@@ -67,6 +68,8 @@ const Login = ({ history }) => {
   };
 
   const signin = async () => {
+    // validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
     setLoader(true);
     if (logUser.email === "" || logUser.password === "") {
       console.log("🚀 ~ file: login.screen.js:57 ~ signin ~ logUser", logUser);
@@ -213,12 +216,37 @@ const Login = ({ history }) => {
             />
             <Text>{"\n"}</Text>
             <Text style={styles.texts}>Password</Text>
-            <TextInput
-              style={[styles.container, styles.center]}
-              secureTextEntry={true}
-              onChangeText={(text) => setFields(text, "password")}
-              value={logUser.password}
-            />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-around",
+                alignItems: "center",
+              }}
+            >
+              <TextInput
+                style={{
+                  borderRadius: 5,
+                  borderWidth: 1,
+                  width: 300,
+                  height: 45,
+                  padding: 10,
+                }}
+                secureTextEntry={showPwd}
+                onChangeText={(text) => setFields(text, "password")}
+                value={logUser.password}
+              />
+              <TouchableOpacity
+                onPress={() =>
+                  showPwd === false ? setShowPwd(true) : setShowPwd(false)
+                }
+              >
+                {showPwd === true ? (
+                  <EyeIcon size={30} color={"#E90064"} />
+                ) : (
+                  <EyeSlashIcon size={30} color={"#E90064"} />
+                )}
+              </TouchableOpacity>
+            </View>
             <Text>{"\n"}</Text>
             <View style={styles.center}>
               <TouchableOpacity
