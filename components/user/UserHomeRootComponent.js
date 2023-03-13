@@ -27,73 +27,73 @@ import { getAllAssingmentServices } from "../../services/oneForAll";
 const UserMain = () => {
   const navigation = useNavigation();
 
-  // const [assignments, setAssignments] = useState([]);
+  const [assignments, setAssignments] = useState([]);
 
-  const [assignments, setAssignments] = useState([
-    {
-      __v: 0,
-      _id: "63bbb788fdd68b90e18224d7",
-      assignmentBudget: 5000,
-      assignmentName: "laravel admin pannel",
-      assignmentStatus: "pending",
-      assignmentType: "soft copy",
-      attachments: [
-        "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
-      ],
-      client: "63adae033d9f89a79dfe8d61",
-      createdAt: "2023-01-09T06:43:20.646Z",
-      description: "ecom webapp based on e pharmacy 3-5 page",
-      updatedAt: "2023-01-09T06:43:20.646Z",
-    },
-    {
-      __v: 0,
-      _id: "63bbb788fdd68b90e18224d7",
-      assignmentBudget: 6000,
-      assignmentName: "epharm app",
-      assignmentStatus: "done",
-      assignmentType: "soft copy",
-      attachments: [
-        "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
-      ],
-      client: "63adae033d9f89a79dfe8d61",
-      createdAt: "2023-01-09T06:43:20.646Z",
-      description: "ecom webapp based on e pharmacy 3-5 page",
-      updatedAt: "2023-01-09T06:43:20.646Z",
-    },
-    {
-      __v: 0,
-      _id: "63bbb788fdd68b90e18224d7",
-      assignmentBudget: 8000,
-      assignmentName: "flutter ecom app",
-      assignmentStatus: "pending",
-      assignmentType: "soft copy",
-      attachments: [
-        "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
-      ],
-      client: "63adae033d9f89a79dfe8d61",
-      createdAt: "2023-01-09T06:43:20.646Z",
-      description: "ecom webapp based on e pharmacy 3-5 page",
-      updatedAt: "2023-01-09T06:43:20.646Z",
-    },
-    {
-      __v: 0,
-      _id: "63bbb788fdd68b90e18224d7",
-      assignmentBudget: 10000,
-      assignmentName: "php hotel website",
-      assignmentStatus: "pending",
-      assignmentType: "soft copy",
-      attachments: [
-        "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
-      ],
-      client: "63adae033d9f89a79dfe8d61",
-      createdAt: "2023-01-09T06:43:20.646Z",
-      description: "ecom webapp based on e pharmacy 3-5 page",
-      updatedAt: "2023-01-09T06:43:20.646Z",
-    },
-  ]);
+  // const [assignments, setAssignments] = useState([
+  //   {
+  //     __v: 0,
+  //     _id: "63bbb788fdd68b90e18224d7",
+  //     assignmentBudget: 5000,
+  //     assignmentName: "laravel admin pannel",
+  //     assignmentStatus: "pending",
+  //     assignmentType: "soft copy",
+  //     attachments: [
+  //       "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
+  //     ],
+  //     client: "63adae033d9f89a79dfe8d61",
+  //     createdAt: "2023-01-09T06:43:20.646Z",
+  //     description: "ecom webapp based on e pharmacy 3-5 page",
+  //     updatedAt: "2023-01-09T06:43:20.646Z",
+  //   },
+  //   {
+  //     __v: 0,
+  //     _id: "63bbb788fdd68b90e18224d7",
+  //     assignmentBudget: 6000,
+  //     assignmentName: "epharm app",
+  //     assignmentStatus: "done",
+  //     assignmentType: "soft copy",
+  //     attachments: [
+  //       "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
+  //     ],
+  //     client: "63adae033d9f89a79dfe8d61",
+  //     createdAt: "2023-01-09T06:43:20.646Z",
+  //     description: "ecom webapp based on e pharmacy 3-5 page",
+  //     updatedAt: "2023-01-09T06:43:20.646Z",
+  //   },
+  //   {
+  //     __v: 0,
+  //     _id: "63bbb788fdd68b90e18224d7",
+  //     assignmentBudget: 8000,
+  //     assignmentName: "flutter ecom app",
+  //     assignmentStatus: "pending",
+  //     assignmentType: "soft copy",
+  //     attachments: [
+  //       "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
+  //     ],
+  //     client: "63adae033d9f89a79dfe8d61",
+  //     createdAt: "2023-01-09T06:43:20.646Z",
+  //     description: "ecom webapp based on e pharmacy 3-5 page",
+  //     updatedAt: "2023-01-09T06:43:20.646Z",
+  //   },
+  //   {
+  //     __v: 0,
+  //     _id: "63bbb788fdd68b90e18224d7",
+  //     assignmentBudget: 10000,
+  //     assignmentName: "php hotel website",
+  //     assignmentStatus: "pending",
+  //     assignmentType: "soft copy",
+  //     attachments: [
+  //       "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
+  //     ],
+  //     client: "63adae033d9f89a79dfe8d61",
+  //     createdAt: "2023-01-09T06:43:20.646Z",
+  //     description: "ecom webapp based on e pharmacy 3-5 page",
+  //     updatedAt: "2023-01-09T06:43:20.646Z",
+  //   },
+  // ]);
 
-  // const [loader, setLoader] = useState(false);
-  const [loader, setLoader] = useState(true);
+  const [loader, setLoader] = useState(false);
+  // const [loader, setLoader] = useState(true);
 
   useEffect(() => {
     const backAction = () => {
@@ -136,7 +136,7 @@ const UserMain = () => {
 
     theData ? setLoader(false) : setLoader(true);
 
-    // theData ? setAssignments(theData) : [];
+    theData ? setAssignments(theData) : [];
   };
 
   return (
