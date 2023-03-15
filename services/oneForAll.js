@@ -98,3 +98,28 @@ export const getAllAssingmentServices = async () => {
     return { error };
   }
 };
+
+export const getSearchAssignmentServices = async ({ searchTask }) => {
+  console.log("searchTask: ", searchTask);
+  try {
+    const url = `/searchAssignment/${searchTask}`;
+    const link = host + url;
+
+    const response = await axios.get(link);
+    // console.log("response: ", response.data);
+
+    if (response.data.error) {
+      const error = response.data.error;
+
+      return { error };
+    }
+
+    const allSearchAssignment = response.data.found;
+
+    return { allSearchAssignment };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};

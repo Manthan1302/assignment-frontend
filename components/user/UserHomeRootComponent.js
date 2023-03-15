@@ -12,6 +12,8 @@ import {
   KeyboardAvoidingView,
   Modal,
   ActivityIndicator,
+  RefreshControl,
+  ScrollView,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -28,70 +30,7 @@ const UserMain = () => {
   const navigation = useNavigation();
 
   const [assignments, setAssignments] = useState([]);
-
-  // const [assignments, setAssignments] = useState([
-  //   {
-  //     __v: 0,
-  //     _id: "63bbb788fdd68b90e18224d7",
-  //     assignmentBudget: 5000,
-  //     assignmentName: "laravel admin pannel",
-  //     assignmentStatus: "pending",
-  //     assignmentType: "soft copy",
-  //     attachments: [
-  //       "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
-  //     ],
-  //     client: "63adae033d9f89a79dfe8d61",
-  //     createdAt: "2023-01-09T06:43:20.646Z",
-  //     description: "ecom webapp based on e pharmacy 3-5 page",
-  //     updatedAt: "2023-01-09T06:43:20.646Z",
-  //   },
-  //   {
-  //     __v: 0,
-  //     _id: "63bbb788fdd68b90e18224d7",
-  //     assignmentBudget: 6000,
-  //     assignmentName: "epharm app",
-  //     assignmentStatus: "done",
-  //     assignmentType: "soft copy",
-  //     attachments: [
-  //       "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
-  //     ],
-  //     client: "63adae033d9f89a79dfe8d61",
-  //     createdAt: "2023-01-09T06:43:20.646Z",
-  //     description: "ecom webapp based on e pharmacy 3-5 page",
-  //     updatedAt: "2023-01-09T06:43:20.646Z",
-  //   },
-  //   {
-  //     __v: 0,
-  //     _id: "63bbb788fdd68b90e18224d7",
-  //     assignmentBudget: 8000,
-  //     assignmentName: "flutter ecom app",
-  //     assignmentStatus: "pending",
-  //     assignmentType: "soft copy",
-  //     attachments: [
-  //       "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
-  //     ],
-  //     client: "63adae033d9f89a79dfe8d61",
-  //     createdAt: "2023-01-09T06:43:20.646Z",
-  //     description: "ecom webapp based on e pharmacy 3-5 page",
-  //     updatedAt: "2023-01-09T06:43:20.646Z",
-  //   },
-  //   {
-  //     __v: 0,
-  //     _id: "63bbb788fdd68b90e18224d7",
-  //     assignmentBudget: 10000,
-  //     assignmentName: "php hotel website",
-  //     assignmentStatus: "pending",
-  //     assignmentType: "soft copy",
-  //     attachments: [
-  //       "http://localhost:4300/clientAttachments/attachments_1673246600503.pdf",
-  //     ],
-  //     client: "63adae033d9f89a79dfe8d61",
-  //     createdAt: "2023-01-09T06:43:20.646Z",
-  //     description: "ecom webapp based on e pharmacy 3-5 page",
-  //     updatedAt: "2023-01-09T06:43:20.646Z",
-  //   },
-  // ]);
-
+  const [refresh, setRefresh] = useState(false);
   const [loader, setLoader] = useState(false);
   // const [loader, setLoader] = useState(true);
 
@@ -125,6 +64,7 @@ const UserMain = () => {
 
   const getAssignments = async () => {
     setLoader(true);
+    setRefresh(true);
     const data = await getAllAssingmentServices();
 
     const { theData, error } = data;
@@ -134,126 +74,137 @@ const UserMain = () => {
       ? ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
       : "";
 
-    theData ? setLoader(false) : setLoader(true);
+    theData ? setLoader(false) : setLoader(true), setRefresh(false);
 
     theData ? setAssignments(theData) : [];
   };
 
   return (
     <KeyboardAwareScrollView>
-      <SafeAreaView>
-        {loader ? (
-          <Modal
-            transparent={true}
-            style={{ justifyContent: "space-around", alignItems: "center" }}
-          >
-            <View
-              style={{
-                backgroundColor: "#FFF2F2aa",
-                flex: 1,
-                justifyContent: "space-around",
-                alignItems: "center",
-              }}
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refresh}
+            onRefresh={() => getAssignments()}
+          />
+        }
+      >
+        <SafeAreaView>
+          {loader ? (
+            <Modal
+              transparent={true}
+              style={{ justifyContent: "space-around", alignItems: "center" }}
             >
               <View
                 style={{
-                  backgroundColor: "#E90064",
-                  height: 70,
-                  width: 130,
+                  backgroundColor: "#FFFFFFaa",
+                  flex: 1,
                   justifyContent: "space-around",
                   alignItems: "center",
-                  flexDirection: "row",
-                  borderRadius: 5,
-                  borderColor: "white",
-                  borderWidth: 2,
                 }}
               >
-                <ActivityIndicator size={30} color={"white"} />
-                <Text style={{ color: "white", fontSize: 18 }}>Loading...</Text>
-              </View>
-            </View>
-          </Modal>
-        ) : (
-          // all the assignments
-          assignments.map((item) => {
-            if (item.assignmentStatus === "pending") {
-              return (
                 <View
-                  key={item}
                   style={{
-                    justifyContent: "space-evenly",
+                    backgroundColor: "#E90064",
+                    height: 70,
+                    width: 140,
+                    justifyContent: "space-around",
                     alignItems: "center",
+                    flexDirection: "row",
+                    borderRadius: 5,
+                    borderColor: "white",
+                    borderWidth: 2,
                   }}
                 >
+                  <ActivityIndicator size={30} color={"white"} />
+                  <Text style={{ color: "white", fontSize: 18 }}>
+                    Loading...
+                  </Text>
+                </View>
+              </View>
+            </Modal>
+          ) : (
+            // all the assignments
+            assignments.map((item) => {
+              if (item.assignmentStatus === "pending") {
+                return (
                   <View
+                    key={item._id}
                     style={{
-                      flexDirection: "row",
-                      width: 350,
-                      height: 80,
-                      backgroundColor: "white",
-                      justifyContent: "space-around",
+                      justifyContent: "space-evenly",
                       alignItems: "center",
-                      borderRadius: 5,
-                      shadowColor: "#748c94",
-                      elevation: 10,
-
-                      marginTop: 10,
-                      marginBottom: 17,
                     }}
                   >
-                    <View style={{ width: 150 }}>
-                      <Text style={{ fontWeight: "500" }}>
-                        {item.assignmentName}
-                      </Text>
-                      <Text style={{ fontWeight: "500" }}>
-                        {item.assignmentType}
-                      </Text>
-                    </View>
-
                     <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <CurrencyRupeeIcon
-                        color={"#E90064"}
-                        height={25}
-                        width={25}
-                      />
-                      <Text
-                        style={{
-                          fontWeight: "500",
-                        }}
-                      >
-                        {item.assignmentBudget}
-                      </Text>
-                    </View>
-
-                    <TouchableOpacity
                       style={{
-                        backgroundColor: "#E90064",
-                        width: 60,
-                        height: 40,
+                        flexDirection: "row",
+                        width: 350,
+                        height: 80,
+                        backgroundColor: "white",
                         justifyContent: "space-around",
                         alignItems: "center",
-                        borderRadius: 3,
+                        borderRadius: 5,
+                        shadowColor: "#748c94",
+                        elevation: 10,
+
+                        marginTop: 10,
+                        marginBottom: 17,
                       }}
                     >
-                      <Text
+                      <View style={{ width: 150 }}>
+                        <Text style={{ fontWeight: "500" }}>
+                          {item.assignmentName}
+                        </Text>
+                        <Text style={{ fontWeight: "500" }}>
+                          {item.assignmentType}
+                        </Text>
+                      </View>
+
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <CurrencyRupeeIcon
+                          color={"#E90064"}
+                          height={25}
+                          width={25}
+                        />
+                        <Text
+                          style={{
+                            fontWeight: "500",
+                          }}
+                        >
+                          {item.assignmentBudget}
+                        </Text>
+                      </View>
+
+                      <TouchableOpacity
                         style={{
-                          color: "white",
-                          fontSize: 17,
-                          fontWeight: "500",
+                          backgroundColor: "#E90064",
+                          width: 60,
+                          height: 40,
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          borderRadius: 3,
                         }}
                       >
-                        view
-                      </Text>
-                    </TouchableOpacity>
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 17,
+                            fontWeight: "500",
+                          }}
+                        >
+                          view
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              );
-            }
-          })
-        )}
-      </SafeAreaView>
+                );
+              }
+            })
+          )}
+        </SafeAreaView>
+      </ScrollView>
     </KeyboardAwareScrollView>
   );
 };
