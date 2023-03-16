@@ -1,6 +1,6 @@
 import axios from "axios";
 const host = "https://taskify-backend-server.onrender.com";
-
+// const host = "http://localhost:4000";
 export const loginServices = async (data) => {
   console.log("data:", data);
   const url = "/login";
@@ -98,3 +98,23 @@ export const getAllAssingmentServices = async () => {
     return { error };
   }
 };
+
+
+export const getAllUsersServices = async()=>{
+  console.log("------------------------------");
+  
+  const url = "/getAllUsersClient";
+  const link = host + url;
+  try{
+    const response = await axios.get(link);
+    const theData = response.data;
+
+    return { theData };
+  }
+  catch(error)
+  {
+    console.log("error:", error);
+    return { error };
+  }
+};
+ 
