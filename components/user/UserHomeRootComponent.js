@@ -125,11 +125,11 @@ const UserMain = () => {
             </Modal>
           ) : (
             // all the assignments
-            assignments.map((item) => {
+            assignments.map((item, index) => {
               if (item.assignmentStatus === "pending") {
                 return (
                   <View
-                    key={item._id}
+                    key={index}
                     style={{
                       justifyContent: "space-evenly",
                       alignItems: "center",
