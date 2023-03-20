@@ -2,7 +2,7 @@
 import { myStore, persistor } from "./store";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
-import MainApp from "./mainApp";
+import MainApp from "./MainApp";
 
 export default function App() {
   return (
