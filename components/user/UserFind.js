@@ -35,9 +35,17 @@ const UserFind = () => {
   const [searchedTask, setSearchedTask] = useState([]);
   const [recent, setRecent] = useState([]);
 
+  const navigation = useNavigation();
+
   useEffect(() => {
     getRecentSearches();
   }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  });
 
   const storeRecentSearches = async (item) => {
     console.log("item store : ", item);
@@ -340,6 +348,10 @@ const UserFind = () => {
                         }}
                         onPress={async () => {
                           await storeRecentSearches(item.assignmentName);
+
+                          navigation.navigate("ViewAssignment", {
+                            assignment: item,
+                          });
                         }}
                       >
                         <Text

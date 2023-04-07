@@ -21,7 +21,6 @@ import { loginServices } from "../services/oneForAll";
 import { useDispatch } from "react-redux";
 import { userData } from "../services/UserData.reducer";
 import { clientData } from "../services/ClientData.reducer";
-import { adminData } from "../services/AdminData.reducer";
 import { EyeIcon, EyeSlashIcon } from "react-native-heroicons/outline";
 
 const Login = ({ history }) => {
@@ -140,48 +139,6 @@ const Login = ({ history }) => {
     }
   };
 
-  const signInweb = async () => {
-    setLoader(true);
-    if (logUser.email === "" || logUser.password === "") {
-      console.log(
-        "🚀 ~ file: login.screen.js:118 ~ signInweb ~ logUser",
-        logUser
-      );
-      alert("Please enter all details");
-      setLoader(false);
-    } else {
-      const reply = await loginServices(logUser);
-      const { response, error } = reply;
-      console.log("response: ", response);
-
-      if (response) {
-        const { token, user } = response;
-        console.log(
-          "🚀 ~ file: login.screen.js:73 ~ signin ~ response",
-          response
-        );
-        setLoader(false);
-        setLogUser({
-          email: "",
-          password: "",
-        });
-
-        alert(`Sign in Successfull!`);
-
-        dispatch(adminData({ actor, token }));
-        navigation.navigate("theOwnerAdmin");
-      } else if (error) {
-        console.log("🚀 ~ file: login.screen.js:105 ~ signin ~ error", error);
-        ToastAndroid.show(
-          `${error.message}`,
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM
-        );
-        setLoader(false);
-      }
-    }
-  };
-
   if (Platform.OS === "android" || Platform.OS === "ios") {
     return (
       <SafeAreaView style={{ backgroundColor: "#fff", height: "100%" }}>
@@ -287,71 +244,6 @@ const Login = ({ history }) => {
           </View>
         </KeyboardAwareScrollView>
       </SafeAreaView>
-    );
-  } else {
-    return (
-      <div style={{ display: "flex", backgroundColor: "#FCC2FC" }}>
-        <div>
-          <img src={login} style={{ height: 735, flex: 50 }}></img>
-        </div>
-        <hr></hr>
-
-        <div style={{ flex: 50 }}>
-          <div style={{ textAlign: "center" }}>
-            <h2 style={{ textAlign: "Center", fontSize: 30, color: "#fff" }}>
-              Please Enter Your Login Details
-            </h2>
-            <hr></hr>
-            <br></br>
-            <br></br>
-
-            <label style={{ marginRight: 200, color: "#fff" }}>Email</label>
-            <br></br>
-            <TextInput
-              type="text"
-              placeholder="Enter email.."
-              style={{ height: 30, width: 250, borderRadius: 7 }}
-              onChangeText={(text) => setFields(text, "email")}
-            />
-            <br></br>
-            <br></br>
-            <label style={{ marginRight: 180, color: "#fff" }}>Password</label>
-            <br></br>
-            <TextInput
-              type="text"
-              placeholder="Enter Password.."
-              style={{ height: 30, width: 250, borderRadius: 7 }}
-              onChangeText={(text) => setFields(text, "password")}
-              secureTextEntry={true}
-            />
-            <br></br>
-            <br></br>
-            <br></br>
-            <TouchableOpacity
-              style={{
-                width: 150,
-                height: 35,
-
-                borderRadius: 5,
-
-                outline: "none",
-                backgroundColor: "white",
-                cursor: "pointer",
-                display: "flex",
-                justifyContent: "space-around",
-                alignItems: "center",
-              }}
-              onPress={() => signInweb()}
-            >
-              {onLoad ? (
-                <ActivityIndicator size={10} color={"#E90064"} />
-              ) : (
-                <Text style={{ color: "#E90064", fontSize: 15 }}>Login</Text>
-              )}
-            </TouchableOpacity>
-          </div>
-        </div>
-      </div>
     );
   }
 };

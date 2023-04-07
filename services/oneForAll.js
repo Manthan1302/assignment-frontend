@@ -29,11 +29,16 @@ export const loginServices = async (data) => {
 export const signupUserServices = async (data) => {
   console.log("------------------------------");
   console.log("data:", data);
+
   const url = "/signupUser";
   const link = host + url;
 
   try {
-    const result = await axios.post(link, data);
+    const result = await axios.post(link, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     console.log(
       "==========================================================================="
     );
@@ -99,26 +104,21 @@ export const getAllAssingmentServices = async () => {
   }
 };
 
-
-
-export const getAllUsersServices = async()=>{
+export const getAllUsersServices = async () => {
   console.log("------------------------------");
-  
+
   const url = "/getAllUsersClient";
   const link = host + url;
-  try{
+  try {
     const response = await axios.get(link);
     const theData = response.data;
 
     return { theData };
-  }
-  catch(error)
-  {
+  } catch (error) {
     console.log("error:", error);
     return { error };
   }
 };
- 
 
 export const getSearchAssignmentServices = async ({ searchTask }) => {
   console.log("searchTask: ", searchTask);
@@ -145,3 +145,92 @@ export const getSearchAssignmentServices = async ({ searchTask }) => {
   }
 };
 
+export const getBidsonTaskServices = async ({ _id }) => {
+  try {
+    const url = `/getParticularTaskBid/${_id}`;
+    const link = host + url;
+    // console.log("link: ", link);
+
+    const response = await axios.get(link);
+
+    // console.log("response: ", response.data);
+
+    const { allTaskBids, error } = response.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { allTaskBids };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const postBidonTaskService = async ({ taskId, userBid, headers }) => {
+  const url = `/postBid/${taskId}`;
+  const link = host + url;
+
+  try {
+    const response = await axios.post(link, userBid, headers);
+
+    const usersBid = response.data;
+    const { myBid, error } = usersBid;
+
+    if (error) {
+      return { error };
+    }
+
+    return { myBid };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const getMyBidsService = async ({ headers }) => {
+  const url = "/getMyBid";
+  const link = host + url;
+
+  try {
+    const response = await axios.get(link, headers);
+    console.log("-------------------------------------");
+    console.log("response: ", response.data);
+
+    const { findMyBid, error } = response.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { findMyBid };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const getOrdersForUserService = async ({ headers }) => {
+  const url = "/getUserOrders";
+  const link = host + url;
+
+  try {
+    const response = await axios.get(link, headers);
+
+    const { userOrders, error } = response.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { userOrders };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};

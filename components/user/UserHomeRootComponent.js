@@ -34,7 +34,43 @@ const UserMain = () => {
   const [loader, setLoader] = useState(false);
   // const [loader, setLoader] = useState(true);
 
+  const backAction = () => {
+    Alert.alert("Exit App", "Exiting the application", [
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel",
+      },
+      {
+        text: "Ok",
+        onPress: () => BackHandler.exitApp(),
+      },
+    ]);
+    return true;
+  };
+  const backHandler = BackHandler.addEventListener(
+    "hardwareBackPress",
+    backAction
+  );
+
   useEffect(() => {
+    getAssignments();
+  }, []);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+
+      headerBackVisible: false,
+      headerTitle: "Tasks",
+      headerStyle: {
+        backgroundColor: "#E90064",
+      },
+      headerTitleStyle: {
+        color: "white",
+        fontWeight: "500",
+      },
+    });
+
     const backAction = () => {
       Alert.alert("Exit App", "Exiting the application", [
         {
@@ -53,13 +89,6 @@ const UserMain = () => {
       "hardwareBackPress",
       backAction
     );
-
-    getAssignments();
-  }, []);
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
   }, []);
 
   const getAssignments = async () => {
@@ -147,7 +176,7 @@ const UserMain = () => {
                         shadowColor: "#748c94",
                         elevation: 10,
 
-                        marginTop: 10,
+                        // marginTop: 10,
                         marginBottom: 17,
                       }}
                     >
@@ -186,6 +215,11 @@ const UserMain = () => {
                           alignItems: "center",
                           borderRadius: 3,
                         }}
+                        onPress={() =>
+                          navigation.navigate("ViewAssignment", {
+                            assignment: item,
+                          })
+                        }
                       >
                         <Text
                           style={{

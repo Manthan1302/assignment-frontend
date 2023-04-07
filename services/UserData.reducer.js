@@ -6,6 +6,7 @@ const userDataSlice = createSlice({
     _id: "",
     firstName: "",
     lastName: "",
+    profilePic: "",
     gender: "",
     email: "",
     password: "",
@@ -34,6 +35,7 @@ const userDataSlice = createSlice({
         firstName,
         lastName,
         gender,
+        profilePic,
         email,
         password,
         phoneNumber,
@@ -45,13 +47,13 @@ const userDataSlice = createSlice({
         experience,
         about,
         usertype,
-        workDemo,
       } = user;
       state._id = _id;
       state.firstName = firstName;
       state.lastName = lastName;
       state.gender = gender;
       state.email = email;
+      state.profilePic = profilePic;
       state.password = password;
       state.phoneNumber = phoneNumber;
       state.area = area;
@@ -62,10 +64,13 @@ const userDataSlice = createSlice({
       state.experience = experience;
       state.about = about ? about : "";
       state.usertype = usertype;
-      state.workDemo = workDemo ? workDemo : "";
+    },
+
+    workDemo: (state, action) => {
+      console.log("action: ", action);
     },
   },
 });
 
-export const { userData } = userDataSlice.actions;
+export const { userData, workDemo } = userDataSlice.actions;
 export default userDataSlice.reducer;
