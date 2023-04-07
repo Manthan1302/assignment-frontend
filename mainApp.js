@@ -55,6 +55,12 @@ import ClientFind from "./components/client/ClientFind";
 import ClientPost from "./components/client/ClientPost";
 import ClientChat from "./components/client/ClientChat";
 import ClientSetting from "./components/client/ClientSetting";
+import FunctionalPage from "./components/user/FunctionalPage";
+import UserTaskHistory from "./components/user/UserTaskHistory";
+import UserNotifications from "./components/user/UserNotifications";
+import UserPayments from "./components/user/UserPayments";
+import UserBids from "./components/user/UserBids";
+import ViewAssignment from "./components/user/ViewAssignment";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -70,7 +76,6 @@ const UserHome = () => {
       initialRouteName="UserMain"
       screenOptions={{
         tabBarHideOnKeyboard: true,
-        headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
           position: "absolute",
@@ -398,7 +403,9 @@ const MainApp = () => {
           <Stack.Screen
             name="UserNav"
             component={UserHome}
-            options={{ headerShown: false }}
+            options={{
+              headerShown: false,
+            }}
           />
 
           <Stack.Screen name="Onboard" component={OnboardScreen} />
@@ -407,6 +414,42 @@ const MainApp = () => {
           <Stack.Screen name="theOwnerAdmin" component={AdminScreen} />
           <Stack.Screen name="ClientSignup" component={ClientSignupScreen} />
           <Stack.Screen name="UserSignup" component={UserSignupScreen} />
+          <Stack.Screen name="ViewAssignment" component={ViewAssignment} />
+          <Stack.Screen
+            name="UserTaskHistory"
+            component={UserTaskHistory}
+            options={{
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="UserNotifications"
+            component={UserNotifications}
+            options={{
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="UserPayments"
+            component={UserPayments}
+            options={{
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="UserBids"
+            component={UserBids}
+            options={{
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="FunctionalPage"
+            component={FunctionalPage}
+            options={{
+              animation: "slide_from_right",
+            }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -449,6 +492,14 @@ const MainApp = () => {
           <Stack.Screen name="theOwnerAdmin" component={AdminScreen} />
           <Stack.Screen name="ClientSignup" component={ClientSignupScreen} />
           <Stack.Screen name="UserSignup" component={UserSignupScreen} />
+          <Stack.Screen name="ViewAssignment" component={ViewAssignment} />
+          <Stack.Screen
+            name="FunctionalPage"
+            component={FunctionalPage}
+            options={{
+              animation: "slide_from_right",
+            }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     );

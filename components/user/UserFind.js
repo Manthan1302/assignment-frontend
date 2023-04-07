@@ -35,9 +35,17 @@ const UserFind = () => {
   const [searchedTask, setSearchedTask] = useState([]);
   const [recent, setRecent] = useState([]);
 
+  const navigation = useNavigation();
+
   useEffect(() => {
     getRecentSearches();
   }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  });
 
   const storeRecentSearches = async (item) => {
     console.log("item store : ", item);
@@ -50,6 +58,19 @@ const UserFind = () => {
     } catch (e) {
       console.log("error :", e);
     }
+  };
+
+  const clear = async () => {
+    const keys = await AsyncStorage.getAllKeys();
+    keys.map((item) => {
+      console.log("item keys: ", item);
+
+      if (item === "persist:root") {
+        console.log("cookies not deleted");
+      } else {
+        AsyncStorage.removeItem(item);
+      }
+    });
   };
 
   const getRecentSearches = async () => {
@@ -111,9 +132,10 @@ const UserFind = () => {
               marginTop: 10,
               marginBottom: 10,
             }}
-            onChangeText={(text) => {
+            onChangeText={async (text) => {
               setSearch(text);
-              getSearchAssignment();
+              await getSearchAssignment();
+              await getRecentSearches();
             }}
             value={searchTask}
           />
@@ -163,8 +185,8 @@ const UserFind = () => {
                   justifyContent: "space-around",
                   padding: 5,
                 }}
-                onPress={() => {
-                  AsyncStorage.clear(), getRecentSearches();
+                onPress={async () => {
+                  await clear(), await getRecentSearches();
                 }}
               >
                 <Text style={{ fontSize: 17 }}>clear recent searches</Text>
@@ -187,40 +209,38 @@ const UserFind = () => {
                   height: 500,
                 }}
               >
-                {recent !== null && recent.length !== 0 ? (
+                {recent.length !== 1 ? (
                   recent.map((item, index) => {
                     console.log("index: ", index);
                     if (item === "persist:root") {
                       return <Text key={index}></Text>;
                     } else {
                       return (
-                        <>
-                          <TouchableOpacity
-                            key={index}
-                            style={{
-                              backgroundColor: "white",
-                              margin: 10,
-                              justifyContent: "space-around",
-                              alignItems: "center",
-                              flexDirection: "row",
-                              padding: 10,
-                              borderRadius: 5,
-                              shadowColor: "#748c94",
-                              elevation: 10,
-                            }}
-                            onPress={async () => {
-                              setSearch(item);
-                              await getSearchAssignment();
-                            }}
-                          >
-                            <Text style={{ fontSize: 18 }}>{item}</Text>
-                            <ArrowTrendingUpIcon
-                              color={"#E90064"}
-                              height={30}
-                              width={30}
-                            />
-                          </TouchableOpacity>
-                        </>
+                        <TouchableOpacity
+                          key={index}
+                          style={{
+                            backgroundColor: "white",
+                            margin: 10,
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            flexDirection: "row",
+                            padding: 10,
+                            borderRadius: 5,
+                            shadowColor: "#748c94",
+                            elevation: 10,
+                          }}
+                          onPress={async () => {
+                            setSearch(item);
+                            await getSearchAssignment();
+                          }}
+                        >
+                          <Text style={{ fontSize: 18 }}>{item}</Text>
+                          <ArrowTrendingUpIcon
+                            color={"#E90064"}
+                            height={30}
+                            width={30}
+                          />
+                        </TouchableOpacity>
                       );
                     }
                   })
@@ -252,100 +272,100 @@ const UserFind = () => {
               console.log("item: ", item);
               if (item.code) {
                 return (
-                  <>
-                    <View
+                  <View
+                    style={{
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      height: 600,
+                    }}
+                    key={index}
+                  >
+                    <Text
                       style={{
-                        justifyContent: "space-around",
-                        alignItems: "center",
-                        height: 600,
+                        fontSize: 15,
+                        textAlign: "center",
                       }}
-                      key={index}
                     >
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          textAlign: "center",
-                        }}
-                      >
-                        Task you are searching for was not found!
-                        {"\n"}
-                        Please recheck!
-                      </Text>
-                    </View>
-                  </>
+                      Task you are searching for was not found!
+                      {"\n"}
+                      Please recheck!
+                    </Text>
+                  </View>
                 );
               } else {
                 return (
-                  <>
+                  <View
+                    key={index}
+                    style={{
+                      justifyContent: "space-evenly",
+                      alignItems: "center",
+                    }}
+                  >
                     <View
-                      key={index}
                       style={{
-                        justifyContent: "space-evenly",
+                        flexDirection: "row",
+                        width: 350,
+                        height: 80,
+                        backgroundColor: "white",
+                        justifyContent: "space-around",
                         alignItems: "center",
+                        borderRadius: 5,
+                        shadowColor: "#748c94",
+                        elevation: 10,
+
+                        marginTop: 10,
+                        marginBottom: 17,
                       }}
                     >
-                      <View
+                      <View>
+                        <Image
+                          // source={item.attachments[0]}
+                          source={taskImg}
+                          style={{
+                            backgroundColor: "green",
+                            height: 40,
+                            width: 40,
+                          }}
+                        />
+                      </View>
+                      <View style={{ width: 150 }}>
+                        <Text style={{ fontWeight: "500" }}>
+                          {item.assignmentName}
+                        </Text>
+                        <Text style={{ fontWeight: "500" }}>
+                          {item.assignmentType}
+                        </Text>
+                      </View>
+
+                      <TouchableOpacity
                         style={{
-                          flexDirection: "row",
-                          width: 350,
-                          height: 80,
-                          backgroundColor: "white",
+                          backgroundColor: "#E90064",
+                          width: 60,
+                          height: 40,
                           justifyContent: "space-around",
                           alignItems: "center",
-                          borderRadius: 5,
-                          shadowColor: "#748c94",
-                          elevation: 10,
+                          borderRadius: 3,
+                        }}
+                        onPress={async () => {
+                          await storeRecentSearches(item.assignmentName);
 
-                          marginTop: 10,
-                          marginBottom: 17,
+                          navigation.navigate("ViewAssignment", {
+                            assignment: item,
+                          });
                         }}
                       >
-                        <View>
-                          <Image
-                            // source={item.attachments[0]}
-                            source={taskImg}
-                            style={{
-                              backgroundColor: "green",
-                              height: 40,
-                              width: 40,
-                            }}
-                          />
-                        </View>
-                        <View style={{ width: 150 }}>
-                          <Text style={{ fontWeight: "500" }}>
-                            {item.assignmentName}
-                          </Text>
-                          <Text style={{ fontWeight: "500" }}>
-                            {item.assignmentType}
-                          </Text>
-                        </View>
-
-                        <TouchableOpacity
+                        <Text
                           style={{
-                            backgroundColor: "#E90064",
-                            width: 60,
-                            height: 40,
-                            justifyContent: "space-around",
-                            alignItems: "center",
-                            borderRadius: 3,
-                          }}
-                          onPress={async () => {
-                            await storeRecentSearches(item.assignmentName);
+                            color: "white",
+                            fontSize: 17,
+                            fontWeight: "500",
                           }}
                         >
-                          <Text
-                            style={{
-                              color: "white",
-                              fontSize: 17,
-                              fontWeight: "500",
-                            }}
-                          >
-                            view
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
+                          view
+                        </Text>
+                      </TouchableOpacity>
                     </View>
-                  </>
+                  </View>
                 );
               }
             })}

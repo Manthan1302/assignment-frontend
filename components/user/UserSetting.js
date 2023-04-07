@@ -30,7 +30,7 @@ import {
 } from "react-native-heroicons/outline";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import UserMain from "./UserHomeRootComponent";
-import Profilepic from "../../images/profilepic.jpg";
+// import Profilepic from "../../images/profilepic.jpg";
 import Malesymbol from "../../images/malesymbol.png";
 import Femalesymbol from "../../images/femalesymbol.png";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,6 +39,46 @@ import { userData } from "../../services/UserData.reducer";
 const UserSetting = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  const backAction = () => {
+    Alert.alert("Exit App", "Exiting the application", [
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel",
+      },
+      {
+        text: "Ok",
+        onPress: () => BackHandler.exitApp(),
+      },
+    ]);
+    return true;
+  };
+  const backHandler = BackHandler.addEventListener(
+    "hardwareBackPress",
+    backAction
+  );
+
+  useLayoutEffect(() => {
+    const backAction = () => {
+      Alert.alert("Exit App", "Exiting the application", [
+        {
+          text: "Cancel",
+          onPress: () => null,
+          style: "cancel",
+        },
+        {
+          text: "Ok",
+          onPress: () => BackHandler.exitApp(),
+        },
+      ]);
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+  }, []);
 
   const token = useSelector((state) => state.user).token;
   const fname = useSelector((state) => state.user).firstName;
@@ -53,6 +93,7 @@ const UserSetting = () => {
   const pincode = useSelector((state) => state.user).pincode;
   const profession = useSelector((state) => state.user).profession;
   const experience = useSelector((state) => state.user).experience;
+  const profilePic = useSelector((state) => state.user).profilePic;
 
   const logOut = () => {
     const onClickOk = () => {
@@ -121,7 +162,7 @@ const UserSetting = () => {
       <KeyboardAwareScrollView>
         <SafeAreaView style={{ marginBottom: 100 }}>
           <Image
-            source={Profilepic}
+            source={{ uri: profilePic }}
             style={{
               height: 400,
               width: 400,
@@ -134,15 +175,21 @@ const UserSetting = () => {
               bottom: 55,
               left: 20,
               backgroundColor: "white",
-              width: 200,
+              width: 250,
               padding: 5,
               justifyContent: "space-evenly",
               alignItems: "center",
               borderRadius: 8,
             }}
           >
-            <Text style={{ fontSize: 20, color: "#E90064" }}> {fname} </Text>
-            <Text style={{ fontSize: 20, color: "#E90064" }}>{lname}</Text>
+            <View style={{ flexDirection: "row" }}>
+              <Text style={{ fontSize: 20, color: "#E90064" }}>
+                {" "}
+                {fname}
+                {"  "}
+              </Text>
+              <Text style={{ fontSize: 20, color: "#E90064" }}>{lname}</Text>
+            </View>
             <Image
               source={gender === "male" ? Malesymbol : Femalesymbol}
               style={{ height: 25, width: 25, tintColor: "aqua" }}
@@ -222,12 +269,20 @@ const UserSetting = () => {
                     elevation: 20,
                   }}
                 >
-                  <Text style={{ fontSize: 16 }}>{email}</Text>
-                  <Text style={{ fontSize: 16 }}>{phone}</Text>
-                  <Text style={{ fontSize: 16 }}>{area}</Text>
-                  <Text style={{ fontSize: 16 }}>{address}</Text>
-                  <Text style={{ fontSize: 16 }}>{city}</Text>
-                  <Text style={{ fontSize: 16 }}>{pincode}</Text>
+                  <Text style={{ fontSize: 16 }}>
+                    {email ? email : "email"}
+                  </Text>
+                  <Text style={{ fontSize: 16 }}>
+                    {phone ? phone : "phone"}
+                  </Text>
+                  <Text style={{ fontSize: 16 }}>{area ? area : "area"}</Text>
+                  <Text style={{ fontSize: 16 }}>
+                    {address ? address : "address"}
+                  </Text>
+                  <Text style={{ fontSize: 16 }}>{city ? city : "city"}</Text>
+                  <Text style={{ fontSize: 16 }}>
+                    {pincode ? pincode : "pincode"}
+                  </Text>
                   <View
                     style={{
                       flexDirection: "row",
@@ -316,6 +371,7 @@ const UserSetting = () => {
                       shadowColor: "#748c94",
                       elevation: 20,
                     }}
+                    onPress={() => navigation.navigate("UserTaskHistory")}
                   >
                     <ClipboardDocumentListIcon size={30} color={"#E90064"} />
                     <Text style={{ fontSize: 16 }}>Tasks history</Text>
@@ -332,6 +388,7 @@ const UserSetting = () => {
                       shadowColor: "#748c94",
                       elevation: 20,
                     }}
+                    onPress={() => navigation.navigate("UserNotifications")}
                   >
                     <BellAlertIcon size={30} color={"#E90064"} />
                     <Text style={{ fontSize: 16 }}>Notifications</Text>
@@ -348,6 +405,7 @@ const UserSetting = () => {
                       shadowColor: "#748c94",
                       elevation: 20,
                     }}
+                    onPress={() => navigation.navigate("UserPayments")}
                   >
                     <CreditCardIcon size={30} color={"#E90064"} />
                     <Text style={{ fontSize: 16 }}>Payments</Text>
@@ -364,6 +422,7 @@ const UserSetting = () => {
                       shadowColor: "#748c94",
                       elevation: 20,
                     }}
+                    onPress={() => navigation.navigate("UserBids")}
                   >
                     <BanknotesIcon size={30} color={"#E90064"} />
                     <Text style={{ fontSize: 16 }}>My bids.</Text>
@@ -380,11 +439,108 @@ const UserSetting = () => {
                       shadowColor: "#748c94",
                       elevation: 20,
                     }}
+                    onPress={() =>
+                      navigation.navigate("FunctionalPage", {
+                        screenName: "Terms & Conditions",
+                      })
+                    }
                   >
                     <NewspaperIcon size={30} color={"#E90064"} />
                     <Text style={{ fontSize: 16 }}>T&C apply*</Text>
                   </TouchableOpacity>
                 </View>
+              </View>
+
+              {/* informativebuttons */}
+              <View
+                style={{
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  // width: 150,
+                  minHeight: 350,
+                  // backgroundColor: "green",
+                  marginTop: 20,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "white",
+                    height: 70,
+                    alignItems: "center",
+                    width: 350,
+                    height: 100,
+                    borderRadius: 8,
+                    shadowColor: "#748c94",
+                    elevation: 15,
+                    flexDirection: "row",
+                  }}
+                  onPress={() =>
+                    navigation.navigate("FunctionalPage", {
+                      screenName: "About Taskify",
+                    })
+                  }
+                >
+                  <InformationCircleIcon
+                    size={30}
+                    color={"#E90064"}
+                    style={{ paddingLeft: 60, paddingRight: 60 }}
+                  />
+                  <Text style={{ fontSize: 16 }}>About Taskify</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "white",
+                    height: 70,
+                    alignItems: "center",
+
+                    width: 350,
+                    height: 100,
+                    borderRadius: 8,
+                    shadowColor: "#748c94",
+                    elevation: 15,
+                    flexDirection: "row",
+                  }}
+                  onPress={() =>
+                    navigation.navigate("FunctionalPage", {
+                      screenName: "Customer Support",
+                    })
+                  }
+                >
+                  <UserGroupIcon
+                    size={30}
+                    color={"#E90064"}
+                    style={{ paddingLeft: 60, paddingRight: 60 }}
+                  />
+                  <Text style={{ fontSize: 16 }}>Customer support</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "white",
+                    height: 70,
+                    alignItems: "center",
+
+                    width: 350,
+                    height: 100,
+                    borderRadius: 8,
+                    shadowColor: "#748c94",
+                    elevation: 15,
+                    flexDirection: "row",
+                  }}
+                  onPress={() =>
+                    navigation.navigate("FunctionalPage", {
+                      screenName: "Frequenlty Asked Questions",
+                    })
+                  }
+                >
+                  <QuestionMarkCircleIcon
+                    size={30}
+                    color={"#E90064"}
+                    style={{ paddingLeft: 60, paddingRight: 60 }}
+                  />
+                  <Text style={{ fontSize: 16 }}>
+                    Frequently Asked Question's
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -417,6 +573,11 @@ const UserSetting = () => {
                 elevation: 15,
                 flexDirection: "row",
               }}
+              onPress={() =>
+                navigation.navigate("FunctionalPage", {
+                  screenName: "About Taskify",
+                })
+              }
             >
               <InformationCircleIcon
                 size={30}
@@ -438,6 +599,11 @@ const UserSetting = () => {
                 elevation: 15,
                 flexDirection: "row",
               }}
+              onPress={() =>
+                navigation.navigate("FunctionalPage", {
+                  screenName: "Customer Support",
+                })
+              }
             >
               <UserGroupIcon
                 size={30}
@@ -459,6 +625,11 @@ const UserSetting = () => {
                 elevation: 15,
                 flexDirection: "row",
               }}
+              onPress={() =>
+                navigation.navigate("FunctionalPage", {
+                  screenName: "Frequenlty Asked Questions",
+                })
+              }
             >
               <QuestionMarkCircleIcon
                 size={30}
@@ -481,6 +652,11 @@ const UserSetting = () => {
                 elevation: 15,
                 flexDirection: "row",
               }}
+              onPress={() =>
+                navigation.navigate("FunctionalPage", {
+                  screenName: "Terms & Conditions",
+                })
+              }
             >
               <NewspaperIcon
                 size={30}
