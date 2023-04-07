@@ -103,7 +103,6 @@ export const getAllAssingmentServices = async () => {
 
 export const getAllUsersServices = async()=>{
   console.log("------------------------------");
-  
   const url = "/getAllUsersClient";
   const link = host + url;
   try{
