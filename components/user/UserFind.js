@@ -111,7 +111,7 @@ const UserFind = () => {
       <SafeAreaView>
         {/* search bar */}
         <View
-          style={{
+          style={{ 
             flexDirection: "row",
             justifyContent: "space-around",
             alignItems: "center",

@@ -27,6 +27,9 @@ const ClientMain = () => {
   const dispatch = useDispatch();
   const [loader, setLoader] = useState(true);
 const [users,setUsers]=useState([]); 
+
+const clientToken = useSelector((state) => state.client).token;
+ 
   useEffect(() => {
     const backAction = () => {
       Alert.alert("Exit App", "Exiting the application", [
@@ -58,17 +61,19 @@ const [users,setUsers]=useState([]);
 
   const getUser = async ()=>{
     setLoader(true);
-    const data =  await getAllUsersServices();
+    const headers = { headers: { Authorization: `Bearer ${clientToken}` } };
+    const data =  await getAllUsersServices({headers});
+   
 
-    const {theData,error} = data;
-    console.log("theData:", theData)
+    // const {users,error} = data;
+    // console.log("user:", users)
     
-    error && theData === undefined
-    ?ToastAndroid.show(`${error}`,ToastAndroid.SHORT,ToastAndroid.BOTTOM)
-    :"";
+    // error && users === undefined
+    // ?ToastAndroid.show(`${error}`,ToastAndroid.SHORT,ToastAndroid.BOTTOM)
+    // :"";
 
-    theData ? setLoader(false) : setLoader(true);
-    theData ? setUsers(theData):[];r
+    // users ? setLoader(false) : setLoader(true);
+    // users ? setUsers(users):[];
   };
  
   return(
@@ -107,38 +112,42 @@ const [users,setUsers]=useState([]);
           </Modal>
         ) : (
           users.map((item)=>{
-            return(
-              <View 
-              key={item}>
-                 <View style={{
-                height: 440,
-                width: 375,
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}>
-          <View style={{backgroundColor:"#E90064",padding:5}}>
+            if(item.usertype === "user")
+            {
+              return(
+                <View 
+                key={item}>
+                   <View style={{
+                  height: 440,
+                  width: 375,
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}>
+            <View style={{backgroundColor:"#E90064",padding:5}}>
+            
+            <Text style={{fontSize:20,color:"white" }}>
+            <UserCircleIcon size={35} color={"white"} style={{marginTop:15}} ></UserCircleIcon>  
+              
+            </Text>
+            <Text style={{marginLeft:45,fontSize:20,color:"white",marginTop:-30 }}>{item.firstName} {item.lastName}</Text>
+    
+            </View>
+            <View>
+                <Image source={item.profilePic} style={{
+                  height: 400,
+                  width: 370,
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  
+                }}></Image>
+            </View>
+          </View>
+          <Text>{"\n"}</Text>
           
-          <Text style={{fontSize:20,color:"white" }}>
-          <UserCircleIcon size={35} color={"white"} style={{marginTop:15}} ></UserCircleIcon>  
-            {item.firstName} {item.lastName}
-          </Text>
-  
-          </View>
-          <View>
-              <Image source={image} style={{
-                height: 400,
-                width: 370,
-                marginLeft: "auto",
-                marginRight: "auto",
-                
-              }}></Image>
-          </View>
-        </View>
-        <Text>{"\n"}</Text>
-        
-        
-              </View>
-            )
+          
+                </View>
+              )
+            }
           })
         )}
        

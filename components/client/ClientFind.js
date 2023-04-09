@@ -11,45 +11,359 @@ import {
   ToastAndroid,
   KeyboardAvoidingView,
 } from "react-native";
+import taskImg from "../../images/signup.jpg";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { UserIcon, UserGroupIcon } from "react-native-heroicons/outline";
+import {
+  UserIcon,
+  UserGroupIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
+} from "react-native-heroicons/outline";
+import { ArrowTrendingUpIcon } from "react-native-heroicons/solid";
 
 const ClientFind = () => {
+  const [searchUser, setSearch] = useState("");
+  const [searchedUser, setSearchedUser] = useState([]);
+  const [recent, setRecent] = useState([]);
+
   const navigation = useNavigation();
 
   useEffect(() => {
-    const backAction = () => {
-      Alert.alert("Exit App", "Exiting the application", [
-        {
-          text: "Cancel",
-          onPress: () => null,
-          style: "cancel",
-        },
-        {
-          text: "Ok",
-          onPress: () => BackHandler.exitApp(),
-        },
-      ]);
-      return true;
-    };
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
+    getRecentSearches();
   }, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
   }, []);
 
+  const storeRecentSearches = async (item) => {
+    console.log("item store : ", item);
+
+    try {
+      const value = await AsyncStorage.getAllKeys();
+      console.log("value in store recent: ", value);
+
+      await AsyncStorage.setItem(item, item);
+    } catch (e) {
+      console.log("error :", e);
+    }
+  };
+
+  const clear = async () => {
+    const keys = await AsyncStorage.getAllKeys();
+    keys.map((item) => {
+      console.log("item keys: ", item);
+
+      if (item === "persist:root") {
+        console.log("cookies not deleted");
+      } else {
+        AsyncStorage.removeItem(item);
+      }
+    });
+  };
+
+
+  const getRecentSearches = async () => {
+    try {
+      const value = await AsyncStorage.getAllKeys();
+      console.log("value: ", value);
+
+      // AsyncStorage.clear();
+
+      setRecent(value);
+    } catch (e) {
+      console.log("e: ", e);
+    }
+  };
+
+  console.log("---------------------------------------------------------");
+
+  const getSearchUser = async () => {
+    console.log("searchUser: ", searchUser);
+
+    const result = await getSearchUserServices({ searchUser });
+
+    const { error, allSearchUser } = result;
+    console.log("allSearchUser: ", allSearchUser);
+
+    if (error) {
+      console.log("error :", error);
+      setSearchedUser([error]);
+    } else if (allSearchUser) {
+      setSearchedUser(allSearchUser);
+    }
+  };
   return (
-    <SafeAreaView>
-      <Text>Client find screen</Text>
-    </SafeAreaView>
+    <KeyboardAwareScrollView>
+      <SafeAreaView>
+      <View
+          style={{ 
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+          }}
+        >
+          <TextInput
+            placeholder="search for User..."
+            style={{
+              backgroundColor: "white",
+              color: "black",
+              height: 60,
+              width: 300,
+              fontSize: 18,
+              padding: 10,
+              borderRadius: 5,
+              shadowColor: "#748c94",
+              elevation: 10,
+              marginTop: 10,
+              marginBottom: 10,
+            }}
+            onChangeText={async (text) => {
+              setSearch(text);
+              await getSearchUser();
+              await getRecentSearches();
+            }}
+            value={searchUser}
+          />
+          <TouchableOpacity
+            style={{
+              backgroundColor: "white",
+              borderRadius: 5,
+              height: 60,
+              width: 60,
+              justifyContent: "space-around",
+              alignItems: "center",
+              shadowColor: "#748c94",
+              elevation: 10,
+              marginTop: 10,
+              marginBottom: 10,
+            }}
+            onPress={() => getSearchUser()}
+          >
+            <MagnifyingGlassIcon color={"#E90064"} height={"40"} width={"40"} />
+          </TouchableOpacity>
+        </View>
+        {searchUser === "" ? (
+          <>
+            <Text
+              style={{
+                fontSize: 17,
+                textAlign: "center",
+                marginTop: 40,
+                fontWeight: "500",
+                marginBottom: 20,
+              }}
+            >
+              recent
+            </Text>
+            <View style={{ alignItems: "center" }}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: "white",
+                  borderRadius: 5,
+                  shadowColor: "#748c94",
+                  elevation: 10,
+                  width: 220,
+                  height: 40,
+                  justifyContent: "space-around",
+                  padding: 5,
+                }}
+                onPress={async () => {
+                  await clear(), await getRecentSearches();
+                }}
+              >
+                <Text style={{ fontSize: 17 }}>clear recent searches</Text>
+                <XMarkIcon color={"#E90064"} height={30} width={30} />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                justifyContent: "space-around",
+                alignItems: "center",
+                marginTop: 30,
+              }}
+            >
+              <View
+                style={{
+                  // backgroundColor: "green",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  width: 350,
+                  height: 500,
+                }}
+              >
+                {recent.length !== 1 ? (
+                  recent.map((item, index) => {
+                    console.log("index: ", index);
+                    if (item === "persist:root") {
+                      return <Text key={index}></Text>;
+                    } else {
+                      return (
+                        <TouchableOpacity
+                          key={index}
+                          style={{
+                            backgroundColor: "white",
+                            margin: 10,
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            flexDirection: "row",
+                            padding: 10,
+                            borderRadius: 5,
+                            shadowColor: "#748c94",
+                            elevation: 10,
+                          }}
+                          onPress={async () => {
+                            setSearch(item);
+                            await getSearchUser();
+                          }}
+                        >
+                          <Text style={{ fontSize: 18 }}>{item}</Text>
+                          <ArrowTrendingUpIcon
+                            color={"#E90064"}
+                            height={30}
+                            width={30}
+                          />
+                        </TouchableOpacity>
+                      );
+                    }
+                  })
+                ) : (
+                  <>
+                    <View
+                      style={{
+                        alignItems: "center",
+                        width: 350,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 17,
+                        }}
+                      >
+                        No recent found!
+                      </Text>
+                    </View>
+                  </>
+                )}
+              </View>
+            </View>
+          </>
+        ) : (
+          <View>
+            {searchedUser.map((item, index) => {
+              console.log("===============================================");
+              console.log("item: ", item);
+              if (item.code) {
+                return (
+                  <View
+                    style={{
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      height: 600,
+                    }}
+                    key={index}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        textAlign: "center",
+                      }}
+                    >
+                      User you are searching for was not found!
+                      {"\n"}
+                      Please recheck!
+                    </Text>
+                  </View>
+                );
+              } else {
+                return (
+                  <View
+                    key={index}
+                    style={{
+                      justifyContent: "space-evenly",
+                      alignItems: "center",
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        width: 350,
+                        height: 80,
+                        backgroundColor: "white",
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        borderRadius: 5,
+                        shadowColor: "#748c94",
+                        elevation: 10,
+
+                        marginTop: 10,
+                        marginBottom: 17,
+                      }}
+                    >
+                      <View>
+                        <Image
+                          // source={item.attachments[0]}
+                          source={taskImg}
+                          style={{
+                            backgroundColor: "green",
+                            height: 40,
+                            width: 40,
+                          }}
+                        />
+                      </View>
+                      <View style={{ width: 150 }}>
+                        <Text style={{ fontWeight: "500" }}>
+                          {item.firstName}
+                        </Text>
+                        <Text style={{ fontWeight: "500" }}>
+                          {item.lastName}
+                        </Text>
+                      </View>
+
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "#E90064",
+                          width: 60,
+                          height: 40,
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          borderRadius: 3,
+                        }}
+                        onPress={async () => {
+                          await storeRecentSearches(item.firstName);
+
+                          navigation.navigate("ViewAssignment", {
+                            assignment: item,
+                          });
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 17,
+                            fontWeight: "500",
+                          }}
+                        >
+                          view
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              }
+            })}
+          </View>
+        )}
+      </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 };
 
