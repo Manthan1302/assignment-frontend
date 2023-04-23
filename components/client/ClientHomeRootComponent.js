@@ -68,6 +68,7 @@ const [users,setUsers]=useState([]);
     :"";
 
     theData ? setLoader(false) : setLoader(true);
+    theData ? setUsers(theData):[];r
   };
  
   return(
