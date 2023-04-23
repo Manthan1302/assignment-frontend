@@ -34,6 +34,7 @@ const UserFind = () => {
   const [searchTask, setSearch] = useState("");
   const [searchedTask, setSearchedTask] = useState([]);
   const [recent, setRecent] = useState([]);
+  const [notFound, setNotFound] = useState("");
 
   const navigation = useNavigation();
 
@@ -98,9 +99,15 @@ const UserFind = () => {
 
     if (error) {
       console.log("error :", error);
-      setSearchedTask([error]);
+
+      if (error.code === 404) {
+        setSearchedTask([]);
+        setNotFound("No Such Task Found");
+        console.log("searchTask: ", searchTask);
+      }
     } else if (allSearchAssignment) {
       setSearchedTask(allSearchAssignment);
+      setNotFound("");
     }
   };
 
@@ -267,32 +274,12 @@ const UserFind = () => {
           </>
         ) : (
           <View>
-            {searchedTask.map((item, index) => {
-              console.log("===============================================");
-              console.log("item: ", item);
-              if (item.code) {
-                return (
-                  <View
-                    style={{
-                      justifyContent: "space-around",
-                      alignItems: "center",
-                      height: 600,
-                    }}
-                    key={index}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        textAlign: "center",
-                      }}
-                    >
-                      Task you are searching for was not found!
-                      {"\n"}
-                      Please recheck!
-                    </Text>
-                  </View>
-                );
-              } else {
+            {console.log("notFound: ", notFound)}
+            {notFound === "" ? (
+              searchedTask.map((item, index) => {
+                console.log("===============================================");
+                console.log("item: ", item);
+
                 return (
                   <View
                     key={index}
@@ -367,8 +354,27 @@ const UserFind = () => {
                     </View>
                   </View>
                 );
-              }
-            })}
+              })
+            ) : (
+              <View
+                style={{
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  height: 600,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                    textAlign: "center",
+                  }}
+                >
+                  Task you are searching for was not found!
+                  {"\n"}
+                  Please recheck!
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </SafeAreaView>

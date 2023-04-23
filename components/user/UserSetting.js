@@ -27,6 +27,7 @@ import {
   NewspaperIcon,
   InformationCircleIcon,
   QuestionMarkCircleIcon,
+  Bars3BottomLeftIcon,
 } from "react-native-heroicons/outline";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import UserMain from "./UserHomeRootComponent";
@@ -78,7 +79,10 @@ const UserSetting = () => {
       "hardwareBackPress",
       backAction
     );
-  }, []);
+    navigation.setOptions({
+      headerShown: false,
+    });
+  });
 
   const token = useSelector((state) => state.user).token;
   const fname = useSelector((state) => state.user).firstName;
@@ -94,6 +98,7 @@ const UserSetting = () => {
   const profession = useSelector((state) => state.user).profession;
   const experience = useSelector((state) => state.user).experience;
   const profilePic = useSelector((state) => state.user).profilePic;
+  console.log("profilePic: ", profilePic);
 
   const logOut = () => {
     const onClickOk = () => {
@@ -283,18 +288,10 @@ const UserSetting = () => {
                   <Text style={{ fontSize: 16 }}>
                     {pincode ? pincode : "pincode"}
                   </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      width: 140,
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={{ fontSize: 16 }}>{profession}</Text>
-                    <Text style={{ fontSize: 16 }}>
-                      {experience} yr. of Exp.
-                    </Text>
-                  </View>
+
+                  <Text style={{ fontSize: 16 }}>{profession}</Text>
+                  <Text style={{ fontSize: 16 }}>{experience} yr. of Exp.</Text>
+
                   <TouchableOpacity
                     style={{
                       backgroundColor: "#E90064",
@@ -528,18 +525,16 @@ const UserSetting = () => {
                   }}
                   onPress={() =>
                     navigation.navigate("FunctionalPage", {
-                      screenName: "Frequenlty Asked Questions",
+                      screenName: "Privacy Policy",
                     })
                   }
                 >
-                  <QuestionMarkCircleIcon
+                  <Bars3BottomLeftIcon
                     size={30}
                     color={"#E90064"}
                     style={{ paddingLeft: 60, paddingRight: 60 }}
                   />
-                  <Text style={{ fontSize: 16 }}>
-                    Frequently Asked Question's
-                  </Text>
+                  <Text style={{ fontSize: 16 }}>Privacy Policy</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -627,16 +622,16 @@ const UserSetting = () => {
               }}
               onPress={() =>
                 navigation.navigate("FunctionalPage", {
-                  screenName: "Frequenlty Asked Questions",
+                  screenName: "Privacy Policy",
                 })
               }
             >
-              <QuestionMarkCircleIcon
+              <Bars3BottomLeftIcon
                 size={30}
                 color={"#E90064"}
                 style={{ paddingLeft: 60, paddingRight: 60 }}
               />
-              <Text style={{ fontSize: 16 }}>FAQ's</Text>
+              <Text style={{ fontSize: 16 }}>Privacy Policy</Text>
             </TouchableOpacity>
 
             <TouchableOpacity

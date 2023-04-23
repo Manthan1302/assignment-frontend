@@ -216,6 +216,7 @@ const ViewAssignment = ({ route }) => {
                 alignItems: "center",
                 flexDirection: "row",
                 //   backgroundColor: "green",
+                paddingBottom: 10,
               }}
             >
               <EnvelopeIcon
@@ -226,27 +227,6 @@ const ViewAssignment = ({ route }) => {
               />
               <Text style={{ fontSize: 18 }}>
                 {assignment.client ? assignment.client.email : "client email"}
-              </Text>
-            </View>
-            <View
-              style={{
-                marginTop: 10,
-                justifyContent: "space-around",
-                alignItems: "center",
-                flexDirection: "row",
-                //   backgroundColor: "green",
-              }}
-            >
-              <PhoneArrowUpRightIcon
-                color={"#E90064"}
-                height={20}
-                width={20}
-                style={{ marginRight: 10 }}
-              />
-              <Text style={{ fontSize: 18 }}>
-                {assignment.client
-                  ? assignment.client.contactNumber
-                  : "client phone"}
               </Text>
             </View>
           </View>
