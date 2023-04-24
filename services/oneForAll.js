@@ -57,6 +57,8 @@ export const signupUserServices = async (data) => {
   }
 };
 
+export const uploadWorkDemo = async () => {};
+
 export const signUpClientServices = async (data) => {
   console.log("------------------------------");
   console.log("data:", data);
@@ -316,6 +318,29 @@ export const postMessageUser = async ({ data, headers }) => {
     const reply = await axios.put(link, data, headers);
 
     const { newMessage, error } = reply.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { newMessage };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const postUserAttachment = async ({ fd, headers }) => {
+  console.log("fd: ", fd);
+  try {
+    const url = "/sendUserAttachments";
+    const link = host + url;
+
+    const reply = await axios.put(link, fd, headers);
+
+    const { newMessage, error } = reply.data;
+    console.log("reply.data: ", reply.data);
 
     if (error) {
       return { error };

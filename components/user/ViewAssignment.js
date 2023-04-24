@@ -22,6 +22,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ArrowDownTrayIcon,
+  BanknotesIcon,
   BookOpenIcon,
   EnvelopeIcon,
   EyeIcon,
@@ -285,7 +286,7 @@ const ViewAssignment = ({ route }) => {
                 flexDirection: "row",
               }}
             >
-              <BookOpenIcon
+              <BanknotesIcon
                 color={"#E90064"}
                 height={20}
                 width={20}
@@ -483,7 +484,13 @@ const ViewAssignment = ({ route }) => {
                     <Text style={{ fontSize: 14, textTransform: "capitalize" }}>
                       {item.user.firstName + " " + item.user.lastName}
                     </Text>
-                    <Text style={{ color: "grey" }}>
+                    <Text
+                      style={{
+                        color: "grey",
+                        width: 100,
+                        textAlign: "center",
+                      }}
+                    >
                       {item.user.profession}
                     </Text>
                   </View>

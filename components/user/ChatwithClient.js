@@ -31,7 +31,9 @@ import {
 import {
   getMychatWithClientService,
   postMessageUser,
+  postUserAttachment,
 } from "../../services/oneForAll";
+import * as DocumentPicker from "expo-document-picker";
 
 const ChatwithClient = ({ route }) => {
   useEffect(() => {
@@ -41,6 +43,19 @@ const ChatwithClient = ({ route }) => {
   console.log("chat: ", chat);
   const { clientId, chats, _id } = chat;
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: `${clientId.firstName + " " + clientId.lastName}`,
+      headerStyle: {
+        backgroundColor: "#E90064",
+      },
+      headerTitleStyle: {
+        color: "white",
+      },
+    });
+  }, []);
+
+  const [fileSet, setFile] = useState(false);
   const [chatRoomId, setChatRoomId] = useState(_id); // chatrrom id
 
   const userToken = useSelector((state) => state.user).token;
@@ -53,7 +68,11 @@ const ChatwithClient = ({ route }) => {
   const [chatLoader, setChatload] = useState(false);
 
   const [userMsg, setUserMsg] = useState("");
-  const [userAttachment, setUserAtachment] = useState("");
+  const [userAttachment, setUserAtachment] = useState({
+    uri: "",
+    name: "",
+    type: "",
+  });
 
   const getMyChatwithClient = async () => {
     const headers = { headers: { Authorization: `Bearer ${userToken}` } };
@@ -63,7 +82,7 @@ const ChatwithClient = ({ route }) => {
     const response = await getMychatWithClientService({ _id, headers });
 
     const { chatRoom, error } = response;
-    console.log("chatRoom: ", chatRoom);
+    // console.log("chatRoom: ", chatRoom);
 
     if (error) {
       console.log("error: ", error);
@@ -90,7 +109,7 @@ const ChatwithClient = ({ route }) => {
     const response = await getMychatWithClientService({ _id, headers });
 
     const { chatRoom, error } = response;
-    console.log("chatRoom: ", chatRoom);
+    // console.log("chatRoom: ", chatRoom);
 
     if (error) {
       console.log("error: ", error);
@@ -106,7 +125,83 @@ const ChatwithClient = ({ route }) => {
     setMyChat(chatRoom.chats);
   };
 
+  const postAttachment = async () => {
+    console.log("post attachment function called");
+    console.log("userAttachment: ", userAttachment);
+
+    setChatload(true);
+
+    const fd = new FormData();
+
+    fd.append("clientId", clientId);
+    fd.append("userAttachment", userAttachment);
+
+    const headers = {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        "Content-Type": "multipart/form-data",
+      },
+    };
+
+    const response = await postUserAttachment({ fd, headers });
+
+    const { newMessage, error } = response;
+    console.log("error: ", error);
+    console.log("newMessage: ", newMessage);
+
+    if (error) {
+      console.log("error: ", error);
+      ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+    }
+
+    // newMessage ? setChatload(false) : setChatload(false);
+
+    getMyChatwithClient();
+    setFile(false);
+  };
+
+  const uploadDoc = async () => {
+    try {
+      const file = await DocumentPicker.getDocumentAsync();
+      console.log("file: ", file);
+      const { type, uri, mimeType } = file;
+
+      if (type === "success") {
+        ToastAndroid.show(
+          `Attachment was selecetd!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+
+        setUserAtachment({
+          uri,
+          name: new Date() + "_userAttachment",
+          type: "image/jpg",
+        });
+        setFile(true);
+      } else {
+        ToastAndroid.show(
+          `file selection was canceled!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+    } catch (e) {
+      console.log("e: ", e);
+      ToastAndroid.show(
+        `something went wrong file choosing!`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+  };
+
   const postMessage = async () => {
+    console.log("post messgae function called");
+    if (userMsg === "") {
+      return null;
+    }
+
     setChatload(true);
 
     const headers = { headers: { Authorization: `Bearer ${userToken}` } };
@@ -135,18 +230,6 @@ const ChatwithClient = ({ route }) => {
 
     getMyChatwithClient();
   };
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: `${clientId.firstName + " " + clientId.lastName}`,
-      headerStyle: {
-        backgroundColor: "#E90064",
-      },
-      headerTitleStyle: {
-        color: "white",
-      },
-    });
-  }, []);
 
   return (
     <KeyboardAwareScrollView style={{ marginBottom: 10 }}>
@@ -182,6 +265,8 @@ const ChatwithClient = ({ route }) => {
                       maxWidth: 230,
                       color: "#E90064",
                       fontWeight: "500",
+                      shadowColor: "black",
+                      elevation: 10,
                     }}
                   >
                     {item.client}
@@ -201,6 +286,8 @@ const ChatwithClient = ({ route }) => {
                       maxWidth: 230,
                       color: "white",
                       fontWeight: "500",
+                      shadowColor: "black",
+                      elevation: 10,
                     }}
                   >
                     {item.user}
@@ -223,6 +310,8 @@ const ChatwithClient = ({ route }) => {
                         flexDirection: "row",
                         justifyContent: "space-around",
                         alignItems: "center",
+                        shadowColor: "black",
+                        elevation: 10,
                       }}
                     >
                       <Text
@@ -267,6 +356,8 @@ const ChatwithClient = ({ route }) => {
                         flexDirection: "row",
                         justifyContent: "space-around",
                         alignItems: "center",
+                        shadowColor: "black",
+                        elevation: 10,
                       }}
                     >
                       <TouchableOpacity
@@ -336,6 +427,7 @@ const ChatwithClient = ({ route }) => {
               alignItems: "center",
               borderRadius: 100,
             }}
+            onPress={() => uploadDoc()}
           >
             <PlusCircleIcon size={35} color={"white"} />
           </TouchableOpacity>
@@ -349,7 +441,9 @@ const ChatwithClient = ({ route }) => {
               alignItems: "center",
               borderRadius: 4,
             }}
-            onPress={() => postMessage()}
+            onPress={() => {
+              fileSet ? postAttachment() : postMessage();
+            }}
           >
             {chatLoader ? (
               <ActivityIndicator size={30} color={"white"} />

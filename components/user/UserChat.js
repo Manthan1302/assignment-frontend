@@ -66,6 +66,7 @@ const UserChat = () => {
     const response = await getAllUserChatService({ headers });
 
     const { allChats, error } = response;
+    console.log("allChats in get user chats: ", allChats);
 
     if (error) {
       ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
@@ -145,81 +146,108 @@ const UserChat = () => {
           }}
         >
           <ScrollView>
-            {myChats.map((item, index) => {
-              console.log("item: ", item);
-              return (
-                <TouchableOpacity
-                  key={index}
-                  style={{
-                    backgroundColor: "white",
-                    flexDirection: "row",
-                    justifyContent: "space-around",
-                    alignItems: "center",
+            {console.log("myChats: ", myChats)}
+            {myChats.length !== 0 ? (
+              <View>
+                {myChats.map((item, index) => {
+                  console.log("index: ", index);
+                  console.log("item: ", item);
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      style={{
+                        backgroundColor: "white",
+                        flexDirection: "row",
+                        justifyContent: "space-around",
+                        alignItems: "center",
 
-                    width: 350,
-                    minHeight: 70,
-                    padding: 10,
-                    margin: 15,
-                    borderRadius: 4,
-                    shadowColor: "black",
-                    elevation: 15,
+                        width: 350,
+                        minHeight: 70,
+                        padding: 10,
+                        margin: 15,
+                        borderRadius: 4,
+                        shadowColor: "black",
+                        elevation: 15,
+                      }}
+                      onPress={() =>
+                        navigation.navigate("ChatWithClient", {
+                          chat: item,
+                        })
+                      }
+                    >
+                      <UserCircleIcon
+                        size={40}
+                        color={"white"}
+                        style={{
+                          backgroundColor: "#E90064",
+                          borderRadius: 100,
+                        }}
+                      />
+                      <View style={{ width: 180 }}>
+                        <Text
+                          style={{
+                            marginTop: 5,
+                            fontSize: 16,
+                            fontWeight: "600",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {item.clientId.firstName + item.clientId.lastName}
+                        </Text>
+                        <Text
+                          style={{
+                            marginTop: 5,
+                            fontSize: 14,
+                            fontWeight: "400",
+                          }}
+                        >
+                          {item.clientId.email}
+                        </Text>
+                        <Text
+                          style={{
+                            marginTop: 5,
+                            fontSize: 14,
+                            fontWeight: "400",
+                          }}
+                        >
+                          {item.clientId.profession}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "#E90064",
+                          borderRadius: 4,
+                          height: 50,
+                          width: 65,
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ color: "white" }}>delete</Text>
+                      </TouchableOpacity>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ) : (
+              <View
+                style={{
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  marginTop: 40,
+                }}
+              >
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 17,
+                    fontWeight: "500",
                   }}
-                  onPress={() =>
-                    navigation.navigate("ChatWithClient", {
-                      chat: item,
-                    })
-                  }
                 >
-                  <UserCircleIcon
-                    size={40}
-                    color={"white"}
-                    style={{ backgroundColor: "#E90064", borderRadius: 100 }}
-                  />
-                  <View style={{ width: 180 }}>
-                    <Text
-                      style={{
-                        marginTop: 5,
-                        fontSize: 16,
-                        fontWeight: "600",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {item.clientId.firstName + item.clientId.lastName}
-                    </Text>
-                    <Text
-                      style={{
-                        marginTop: 5,
-                        fontSize: 14,
-                        fontWeight: "400",
-                      }}
-                    >
-                      {item.clientId.email}
-                    </Text>
-                    <Text
-                      style={{
-                        marginTop: 5,
-                        fontSize: 14,
-                        fontWeight: "400",
-                      }}
-                    >
-                      {item.clientId.profession}
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: "#E90064",
-                      borderRadius: 4,
-                      height: 50,
-                      width: 65,
-                      justifyContent: "space-around",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text style={{ color: "white" }}>delete</Text>
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              );
-            })}
+                  Please make a bid to start the chat!
+                </Text>
+              </View>
+            )}
           </ScrollView>
         </View>
       )}

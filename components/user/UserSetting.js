@@ -162,6 +162,8 @@ const UserSetting = () => {
     ]);
   };
 
+  const userWorkDemo = async () => {};
+
   if (token !== "") {
     return (
       <KeyboardAwareScrollView>
@@ -217,19 +219,39 @@ const UserSetting = () => {
                   backgroundColor: "pink",
                   padding: 8,
                   marginBottom: 10,
-                  height: 200,
+                  height: 270,
                   borderRadius: 9,
                   shadowColor: "#748c94",
                   elevation: 20,
                 }}
               >
-                <Text>Work demo</Text>
-                <View style={{ flexDirection: "row" }}>
-                  <TouchableOpacity>
-                    <Text>Edit</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text>Upload</Text>
+                <View
+                  style={{
+                    height: 190,
+                    backgroundColor: "green",
+                    marginBottom: 10,
+                  }}
+                >
+                  <Text>images</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    // backgroundColor: "green",
+                    justifyContent: "space-around",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: "#E90064",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      height: 50,
+                      width: 90,
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 16 }}>Upload</Text>
                   </TouchableOpacity>
                 </View>
               </View>
