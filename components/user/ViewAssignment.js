@@ -22,6 +22,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ArrowDownTrayIcon,
+  BanknotesIcon,
   BookOpenIcon,
   EnvelopeIcon,
   EyeIcon,
@@ -216,6 +217,7 @@ const ViewAssignment = ({ route }) => {
                 alignItems: "center",
                 flexDirection: "row",
                 //   backgroundColor: "green",
+                paddingBottom: 10,
               }}
             >
               <EnvelopeIcon
@@ -226,27 +228,6 @@ const ViewAssignment = ({ route }) => {
               />
               <Text style={{ fontSize: 18 }}>
                 {assignment.client ? assignment.client.email : "client email"}
-              </Text>
-            </View>
-            <View
-              style={{
-                marginTop: 10,
-                justifyContent: "space-around",
-                alignItems: "center",
-                flexDirection: "row",
-                //   backgroundColor: "green",
-              }}
-            >
-              <PhoneArrowUpRightIcon
-                color={"#E90064"}
-                height={20}
-                width={20}
-                style={{ marginRight: 10 }}
-              />
-              <Text style={{ fontSize: 18 }}>
-                {assignment.client
-                  ? assignment.client.contactNumber
-                  : "client phone"}
               </Text>
             </View>
           </View>
@@ -305,7 +286,7 @@ const ViewAssignment = ({ route }) => {
                 flexDirection: "row",
               }}
             >
-              <BookOpenIcon
+              <BanknotesIcon
                 color={"#E90064"}
                 height={20}
                 width={20}
@@ -503,7 +484,13 @@ const ViewAssignment = ({ route }) => {
                     <Text style={{ fontSize: 14, textTransform: "capitalize" }}>
                       {item.user.firstName + " " + item.user.lastName}
                     </Text>
-                    <Text style={{ color: "grey" }}>
+                    <Text
+                      style={{
+                        color: "grey",
+                        width: 100,
+                        textAlign: "center",
+                      }}
+                    >
                       {item.user.profession}
                     </Text>
                   </View>

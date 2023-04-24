@@ -61,7 +61,11 @@ import UserNotifications from "./components/user/UserNotifications";
 import UserPayments from "./components/user/UserPayments";
 import UserBids from "./components/user/UserBids";
 import ViewAssignment from "./components/user/ViewAssignment";
+
 import ViewUser from "./components/client/ViewUser";
+
+import ChatwithClient from "./components/user/ChatwithClient";
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -416,6 +420,7 @@ const MainApp = () => {
           <Stack.Screen name="ClientSignup" component={ClientSignupScreen} />
           <Stack.Screen name="UserSignup" component={UserSignupScreen} />
           <Stack.Screen name="ViewAssignment" component={ViewAssignment} />
+          <Stack.Screen name="ChatWithClient" component={ChatwithClient} />
           <Stack.Screen
             name="UserTaskHistory"
             component={UserTaskHistory}

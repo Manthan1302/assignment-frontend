@@ -28,16 +28,14 @@ export const loginServices = async (data) => {
 
 export const signupUserServices = async (data) => {
   console.log("------------------------------");
-  console.log("data:", data);
+  console.log("data form data:", data);
 
   const url = "/signupUser";
   const link = host + url;
 
   try {
     const result = await axios.post(link, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     });
     console.log(
       "==========================================================================="
@@ -58,6 +56,8 @@ export const signupUserServices = async (data) => {
     return { error };
   }
 };
+
+export const uploadWorkDemo = async () => {};
 
 export const signUpClientServices = async (data) => {
   console.log("------------------------------");
@@ -234,21 +234,48 @@ export const getOrdersForUserService = async ({ headers }) => {
   }
 };
 
-export const getSearchUserServices = async ({searchUser})=>{
-  console.log("searchUser: ", searchUser);
+// export const getSearchUserServices = async ({searchUser})=>{
+//   console.log("searchUser: ", searchUser);
+//   try {
+//     const url = `/searchUser/${searchUser}`;
+//     const link = host + url;
+
+//     const response = await axios.get(link);
+//     if(response.data.error)
+//     {
+//       const error =response.data.error;
+//       return {error};
+//     }
+//     const allSearchUser = response.data.found;
+
+//     return {allSearchUser};
+
+export const onWorkCompleteService = async ({ _id, headers }) => {
+  const url = `/onCompleteTask/${_id}`;
+  const link = host + url;
+
+  const data = { workStatus: "done" };
+
   try {
-    const url = `/searchUser/${searchUser}`;
-    const link = host + url;
+    const response = await axios.put(link, data, headers);
 
-    const response = await axios.get(link);
-    if(response.data.error)
-    {
-      const error =response.data.error;
-      return {error};
+    const { message, error } = response.data;
+    console.log("==================================================");
+    console.log("headers: ", headers);
+    console.log("link: ", link);
+    console.log("response.data: ", response.data);
+
+    if (response.data.code === 500) {
+      const error = "something went wrong in Authentication";
+      return { error };
     }
-    const allSearchUser = response.data.found;
 
-    return {allSearchUser};
+    if (error) {
+      return { error };
+    }
+
+    return { message };
+
   } catch (error) {
     console.log("error: ", error);
 
@@ -256,17 +283,41 @@ export const getSearchUserServices = async ({searchUser})=>{
   }
 };
 
+
 export const deleteAssignmentServices = async (header,id)=>{
   try {
     const url=`/deleteMyTask/${id}`;
     const link=host+url;
     const response = await axios.delete(link,header);
     return response;
+  }catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const deleteMyBidService = async ({ _id, headers }) => {
+  try {
+    const url = `/deleteMyBid/${_id}`;
+    const link = host + url;
+
+    const response = await axios.delete(link, headers);
+
+    const { error, deletedBid } = response.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { deletedBid };
+
   } catch (error) {
     console.log("error: ", error);
 
     return { error };
   }
+
 }
 
 export const postAssignmentsServices = async (data,header)=>{
@@ -276,11 +327,107 @@ export const postAssignmentsServices = async (data,header)=>{
     const response = await axios.post(link,data,header);
     console.log("Response",response);
     return response
+  }
+  catch(error)
+  {
+    console.log("error: ", error);
+
+    return { error };
+  }
+
+};
+
+export const getAllUserChatService = async ({ headers }) => {
+  try {
+    const url = "/getAllClientChats";
+    const link = host + url;
+
+    const response = await axios.get(link, headers);
+    console.log("response: ", response.data);
+
+    const { allChats, error } = response.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { allChats };
+
   } catch (error) {
     console.log("error: ", error);
 
     return { error };
+
   
     
   }
 }
+
+
+
+// user chat and get
+export const postMessageUser = async ({ data, headers }) => {
+  try {
+    const url = "/postMessageUser";
+    const link = host + url;
+
+    const reply = await axios.put(link, data, headers);
+
+    const { newMessage, error } = reply.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { newMessage };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const postUserAttachment = async ({ fd, headers }) => {
+  console.log("fd: ", fd);
+  try {
+    const url = "/sendUserAttachments";
+    const link = host + url;
+
+    const reply = await axios.put(link, fd, headers);
+
+    const { newMessage, error } = reply.data;
+    console.log("reply.data: ", reply.data);
+
+    if (error) {
+      return { error };
+    }
+
+    return { newMessage };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const getMychatWithClientService = async ({ _id, headers }) => {
+  try {
+    const url = `/getUserchatRoomId/${_id}`;
+    const link = host + url;
+
+    const reply = await axios.get(link, headers);
+
+    const { chatRoom, error } = reply.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { chatRoom };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
