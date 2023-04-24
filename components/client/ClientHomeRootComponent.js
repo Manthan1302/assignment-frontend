@@ -21,7 +21,7 @@ import image from "../4529164.jpg";
 import { UserIcon, UserGroupIcon,UserCircleIcon } from "react-native-heroicons/outline";
 import { useDispatch, useSelector } from "react-redux";
 import {getAllUsersServices} from "../../services/oneForAll";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const ClientMain = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -65,15 +65,28 @@ const clientToken = useSelector((state) => state.client).token;
     const data =  await getAllUsersServices({headers});
    
 
-    // const {users,error} = data;
-    // console.log("user:", users)
+    const {users,error} = data;
+    console.log("user:", users)
     
-    // error && users === undefined
-    // ?ToastAndroid.show(`${error}`,ToastAndroid.SHORT,ToastAndroid.BOTTOM)
-    // :"";
+    error && users === undefined
+    ?ToastAndroid.show(`${error}`,ToastAndroid.SHORT,ToastAndroid.BOTTOM)
+    :"";
 
-    // users ? setLoader(false) : setLoader(true);
-    // users ? setUsers(users):[];
+    users ? setLoader(false) : setLoader(true);
+    users ? setUsers(users):[];
+  };
+
+  const storeRecentSearches = async (item) => {
+    console.log("item store : ", item);
+
+    try {
+      const value = await AsyncStorage.getAllKeys();
+      console.log("value in store recent: ", value);
+
+      await AsyncStorage.setItem(item, item);
+    } catch (e) {
+      console.log("error :", e);
+    }
   };
  
   return(
@@ -124,22 +137,37 @@ const clientToken = useSelector((state) => state.client).token;
                   marginRight: "auto",
                 }}>
             <View style={{backgroundColor:"#E90064",padding:5}}>
+            <TouchableOpacity
+                        style={{
+                          backgroundColor: "#E90064",
+                          justifyContent: "space-around",
+                          borderRadius: 3,
+                        }}
+                        onPress={async () => {
+                          await storeRecentSearches(item.firstName);
+
+                          navigation.navigate("ViewUser", {
+                            user: item,
+                          });
+                        }}
+                      >
             
             <Text style={{fontSize:20,color:"white" }}>
             <UserCircleIcon size={35} color={"white"} style={{marginTop:15}} ></UserCircleIcon>  
               
             </Text>
             <Text style={{marginLeft:45,fontSize:20,color:"white",marginTop:-30 }}>{item.firstName} {item.lastName}</Text>
-    
+            </TouchableOpacity>
             </View>
             <View>
-                <Image source={item.profilePic} style={{
+                <Image source={image} style={{
                   height: 400,
                   width: 370,
                   marginLeft: "auto",
                   marginRight: "auto",
                   
-                }}></Image>
+                }} 
+                ></Image>
             </View>
           </View>
           <Text>{"\n"}</Text>

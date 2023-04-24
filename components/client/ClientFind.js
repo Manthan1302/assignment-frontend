@@ -11,20 +11,20 @@ import {
   ToastAndroid,
   KeyboardAvoidingView,
 } from "react-native";
-import taskImg from "../../images/signup.jpg";
+import image from "../4529164.jpg";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { UserCircleIcon } from "react-native-heroicons/outline";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import {
-  UserIcon,
   UserGroupIcon,
   MagnifyingGlassIcon,
   XMarkIcon,
 } from "react-native-heroicons/outline";
 import { ArrowTrendingUpIcon } from "react-native-heroicons/solid";
-
+import {getSearchUserServices} from "../../services/oneForAll"
 const ClientFind = () => {
   const [searchUser, setSearch] = useState("");
   const [searchedUser, setSearchedUser] = useState([]);
@@ -151,17 +151,7 @@ const ClientFind = () => {
         </View>
         {searchUser === "" ? (
           <>
-            <Text
-              style={{
-                fontSize: 17,
-                textAlign: "center",
-                marginTop: 40,
-                fontWeight: "500",
-                marginBottom: 20,
-              }}
-            >
-              recent
-            </Text>
+           
             <View style={{ alignItems: "center" }}>
               <TouchableOpacity
                 style={{
@@ -288,79 +278,52 @@ const ClientFind = () => {
                   <View
                     key={index}
                     style={{
-                      justifyContent: "space-evenly",
-                      alignItems: "center",
+                      height: 440,
+                      width: 375,
+                      marginLeft: "auto",
+                      marginRight: "auto",
                     }}
                   >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        width: 350,
-                        height: 80,
-                        backgroundColor: "white",
-                        justifyContent: "space-around",
-                        alignItems: "center",
-                        borderRadius: 5,
-                        shadowColor: "#748c94",
-                        elevation: 10,
-
-                        marginTop: 10,
-                        marginBottom: 17,
-                      }}
-                    >
-                      <View>
-                        <Image
-                          // source={item.attachments[0]}
-                          source={taskImg}
-                          style={{
-                            backgroundColor: "green",
-                            height: 40,
-                            width: 40,
-                          }}
-                        />
-                      </View>
-                      <View style={{ width: 150 }}>
-                        <Text style={{ fontWeight: "500" }}>
-                          {item.firstName}
-                        </Text>
-                        <Text style={{ fontWeight: "500" }}>
-                          {item.lastName}
-                        </Text>
-                      </View>
-
-                      <TouchableOpacity
+                    <TouchableOpacity
                         style={{
                           backgroundColor: "#E90064",
-                          width: 60,
-                          height: 40,
                           justifyContent: "space-around",
-                          alignItems: "center",
                           borderRadius: 3,
                         }}
                         onPress={async () => {
                           await storeRecentSearches(item.firstName);
 
-                          navigation.navigate("ViewAssignment", {
-                            assignment: item,
+                          navigation.navigate("ViewUser", {
+                            user: item,
                           });
                         }}
                       >
-                        <Text
-                          style={{
-                            color: "white",
-                            fontSize: 17,
-                            fontWeight: "500",
-                          }}
-                        >
-                          view
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
+                    <View style={{backgroundColor:"#E90064",padding:5}}>
+            
+            <Text style={{fontSize:20,color:"white" }}>
+            <UserCircleIcon size={35} color={"white"} style={{marginTop:15}} ></UserCircleIcon>
+            </Text>
+            <Text style={{marginLeft:45,fontSize:20,color:"white",marginTop:-30 }}>{item.firstName} {item.lastName}</Text>
+    
+            </View>
+            </TouchableOpacity>
+            
+            <View>
+                <Image source={image} style={{
+                  height: 400,
+                  width: 370,
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  
+                }}></Image>
+            </View>
                   </View>
                 );
               }
             })}
+              
           </View>
+
         )}
       </SafeAreaView>
     </KeyboardAwareScrollView>

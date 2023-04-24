@@ -53,9 +53,7 @@ const UserMain = () => {
     backAction
   );
 
-  useEffect(() => {
-    getAssignments();
-  }, []);
+ c
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,

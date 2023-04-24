@@ -110,9 +110,9 @@ export const getAllUsersServices = async ({headers}) => {
   try {
 
     const response = await axios.get(link,headers);
-    // const {users} = response.data;
-    console.log("response.data",response.data);
-    // return { users };
+    const users = response.data.allusers;
+    console.log("response.data",response.data.allusers);
+    return { users };
   } catch (error) {
     console.log("error1:", error);
     return { error };
@@ -255,3 +255,32 @@ export const getSearchUserServices = async ({searchUser})=>{
     return { error };
   }
 };
+
+export const deleteAssignmentServices = async (header,id)=>{
+  try {
+    const url=`/deleteMyTask/${id}`;
+    const link=host+url;
+    const response = await axios.delete(link,header);
+    return response;
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+}
+
+export const postAssignmentsServices = async (data,header)=>{
+  const url = "/uploadTask";
+  const link = host+url;
+  try {
+    const response = await axios.post(link,data,header);
+    console.log("Response",response);
+    return response
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  
+    
+  }
+}

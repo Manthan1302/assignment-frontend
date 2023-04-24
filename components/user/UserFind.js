@@ -22,7 +22,6 @@ import {
   XMarkIcon,
 } from "react-native-heroicons/outline";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import UserMain from "./UserHomeRootComponent";
 import { getSearchAssignmentServices } from "../../services/oneForAll";
 import taskImg from "../../images/signup.jpg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
