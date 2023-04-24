@@ -234,21 +234,28 @@ export const getOrdersForUserService = async ({ headers }) => {
   }
 };
 
-// export const getSearchUserServices = async ({searchUser})=>{
-//   console.log("searchUser: ", searchUser);
-//   try {
-//     const url = `/searchUser/${searchUser}`;
-//     const link = host + url;
+export const getSearchUserServices = async ({searchUser})=>{
+  console.log("searchUser: ", searchUser);
+  try {
+    const url = `/searchUser/${searchUser}`;
+    const link = host + url;
 
-//     const response = await axios.get(link);
-//     if(response.data.error)
-//     {
-//       const error =response.data.error;
-//       return {error};
-//     }
-//     const allSearchUser = response.data.found;
+    const response = await axios.get(link);
+    if(response.data.error)
+    {
+      const error =response.data.error;
+      return {error};
+    }
+    const allSearchUser = response.data.found;
 
-//     return {allSearchUser};
+    return {allSearchUser};
+  }
+  catch(error){
+  console.log("error: ", error);
+
+    return { error };
+  }
+}
 
 export const onWorkCompleteService = async ({ _id, headers }) => {
   const url = `/onCompleteTask/${_id}`;
@@ -321,10 +328,11 @@ export const deleteMyBidService = async ({ _id, headers }) => {
 }
 
 export const postAssignmentsServices = async (data,header)=>{
+  console.log("data form data:", header);
   const url = "/uploadTask";
   const link = host+url;
   try {
-    const response = await axios.post(link,data,header);
+    const response = await axios.post(link,data,{header});
     console.log("Response",response);
     return response
   }

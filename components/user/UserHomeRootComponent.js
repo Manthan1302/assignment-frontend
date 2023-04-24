@@ -53,7 +53,7 @@ const UserMain = () => {
     backAction
   );
 
- c
+ 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,

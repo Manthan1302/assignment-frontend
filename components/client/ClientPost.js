@@ -22,15 +22,24 @@ import { UserIcon, UserGroupIcon ,ArrowUpOnSquareStackIcon
 import { deleteAssignmentServices, getAllAssingmentServices, postAssignmentsServices } from "../../services/oneForAll";
 const ClientPost = () => {
   const navigation = useNavigation();
+  const [showPwd, setShowPwd] = useState(true);
   const[addAssignment,setAddAssignment] = useState({
     assignmentName:"",
     assignmentBudget:null , 
     assignmentType:"",
     description:"",
 });
+
+
 const[Img,setImg] = useState({
   attachments:[],
 });
+
+const inputData=(value,name)=>{
+
+  setAddAssignment({...addAssignment,[name]:value})
+  
+};
   const [assignments, setAssignments] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -38,12 +47,7 @@ const[Img,setImg] = useState({
 
 
 
-const inputData=(e)=>{
-  const name = e.target.name;
-  const value = e.target.value;
-  setAddAssignment({...addAssignment,[name]:value})
-  
-};
+
 //add img
 const inputImg=()=>{
   // setImg({attachments:e.target.files});
@@ -94,8 +98,8 @@ const handleDocumentSelection = useCallback(async () => {
     setLoader(true);
     try {
       const {assignmentName,assignmentType,assignmentBudget,description} = addAssignment
-      const {attachments}=Img;
-
+      // const {attachments}=Img;
+      attachments=`http://localhost:4300/clientAttachments/attachments_1678770505806.jpg`;
       const data ={assignmentName,assignmentType,assignmentBudget,description,attachments};
       console.log("Data",data);
 
@@ -104,19 +108,38 @@ const handleDocumentSelection = useCallback(async () => {
       fd.append("assignmentType",assignmentType);
       fd.append("assignmentBudget",assignmentBudget);
       fd.append("description",description);
-
-      for(const key of Object.keys(attachments)){
-        fd.append("attachments",attachments[key]);
-    }
+      fd.append("attachments",attachments);
+    //   for(const key of Object.keys(attachments)){
+    //     fd.append("attachments",attachments[key]);
+    // }
     const headers = {headers:{Authorization: `Bearer ${token}` }}
     const result = await postAssignmentsServices(fd,headers);
     console.log("Result",result);
-    if(result)
+    if (result) {
       setLoader(false);
-      // getAssignments();
+      ToastAndroid.show(
+        `Task added Successfull!`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+      setAddAssignment({
+        assignmentName:"",
+        assignmentType:"",
+        assignmentBudget:"",
+        description:""
+      });
+    }
+    else if (error) {
+      ToastAndroid.show(
+        `${error.message}`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+      setLoader(false);
+    }
 
     } catch (error) {
-      console.log('error: ', error.response);
+      console.log('errors: ', error.response);
     }
 
   }
@@ -138,12 +161,7 @@ const handleDocumentSelection = useCallback(async () => {
       return { error };
     }
     getAssignments();
-    setAddAssignment({
-      assignmentName:"",
-      assignmentType:"",
-      assignmentBudget:"",
-      description:""
-    })
+    
 
   }
 
@@ -181,7 +199,7 @@ const handleDocumentSelection = useCallback(async () => {
           borderColor:"white",
           backgroundColor:"white",
           marginTop:20
-        }} onChange={inputData}  name="assignmentName" value={addAssignment.assignmentName}></TextInput>
+        }} onChangeText={(text)=>inputData(text,"assignmentName")}  ></TextInput>
 
       <TextInput placeholder="Assignment Type" 
         style={{
@@ -192,7 +210,7 @@ const handleDocumentSelection = useCallback(async () => {
           height:50,
           borderColor:"white",
           backgroundColor:"white"
-        }} onChange={inputData}  name={"assignmentType"} value={addAssignment.assignmentType}></TextInput>
+        }} onChangeText={(text)=>inputData(text,"assignmentType")}   ></TextInput>
 
         <TextInput placeholder="Assignment Description" multiline={true} 
         style={{
@@ -203,7 +221,7 @@ const handleDocumentSelection = useCallback(async () => {
           height:50,
           borderColor:"white",
           backgroundColor:"white"
-        }} onChange={inputData}  name={"description"} value={addAssignment.description}></TextInput>
+        }} onChangeText={(text)=>inputData(text,"description")}   ></TextInput>
 
           <TextInput placeholder="Assignment Budget" keyboardType="phone-pad" 
         style={{
@@ -214,8 +232,8 @@ const handleDocumentSelection = useCallback(async () => {
           height:50,
           borderColor:"white",
           backgroundColor:"white"
-        }} onChange={inputData}  name={"assignmentBudget"} value={addAssignment.assignmentBudget}></TextInput>
-      <TouchableOpacity onPress={handleDocumentSelection} onChange={inputImg}> 
+        }} onChangeText={(text)=>inputData(text,"assignmentBudget")}   ></TextInput>
+      <TouchableOpacity onPress={handleDocumentSelection} onChangeText={inputImg}> 
         <View style={{
           backgroundColor:"white",
           width:250,
@@ -227,7 +245,7 @@ const handleDocumentSelection = useCallback(async () => {
           marginLeft:"auto",
           marginRight:"auto"
         }}>
-            <Text style={{marginTop:5,fontSize:18}} value={Img.attachments} >Enter Attachments  </Text>
+            <Text style={{marginTop:5,fontSize:18}}  >Enter Attachments  </Text>
             <Text style={{marginLeft:190,marginTop:-25,fontSize:18}}  ><ArrowUpOnSquareStackIcon style={{color:"black"}}/></Text>  
            
         </View>
