@@ -309,7 +309,6 @@ const handleDocumentSelection = useCallback(async () => {
             // all the assignments
             
             assignments.map((item, index) => {
-        
                 return (
                   <View
                     key={index}
@@ -319,6 +318,12 @@ const handleDocumentSelection = useCallback(async () => {
                       marginTop:25
                     }}
                   >
+                    <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("ClientBid", {
+                        assignment: item,
+                      })
+                    }>
                     <View
                       style={{
                         flexDirection: "row",
@@ -364,6 +369,7 @@ const handleDocumentSelection = useCallback(async () => {
                       <TrashIcon style={{color:"black"}} onPress={()=>deleteAssignment(item)}></TrashIcon>
                       
                     </View>
+                    </TouchableOpacity>
                   </View>
                 );
               

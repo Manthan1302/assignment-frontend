@@ -152,7 +152,7 @@ export const getBidsonTaskServices = async ({ _id }) => {
 
     const response = await axios.get(link);
 
-    // console.log("response: ", response.data);
+    console.log("response: ", response.data);
 
     const { allTaskBids, error } = response.data;
 
@@ -439,3 +439,26 @@ export const getMychatWithClientService = async ({ _id, headers }) => {
   }
 };
 
+export const postOrderServices  =async({_id,headers,data})=>
+{
+  console.log(_id);
+  try {
+    const url = `/placeOrder/${_id}`;
+    const link = host + url;
+
+    const reply = await axios.put(link,data,headers);
+    const { accepted,rejected, error } = reply.data;
+    console.log("reply.data: ", reply.data);
+
+    if (error) {
+      return { error };
+    }
+
+    return { accepted,rejected };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error }
+  }
+
+}
