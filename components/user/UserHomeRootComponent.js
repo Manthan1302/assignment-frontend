@@ -28,6 +28,9 @@ import { getAllAssingmentServices } from "../../services/oneForAll";
 
 const UserMain = () => {
   const navigation = useNavigation();
+  useEffect(() => {
+    getAssignments();
+  }, []);
 
   const [assignments, setAssignments] = useState([]);
   const [refresh, setRefresh] = useState(false);
@@ -53,7 +56,6 @@ const UserMain = () => {
     backAction
   );
 
- 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,

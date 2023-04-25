@@ -105,150 +105,152 @@ const UserChat = () => {
         />
       }
     >
-      {loader ? (
-        <Modal
-          transparent={true}
-          style={{ justifyContent: "space-around", alignItems: "center" }}
-        >
-          <View
-            style={{
-              backgroundColor: "#FFFFFFaa",
-              flex: 1,
-              justifyContent: "space-around",
-              alignItems: "center",
-            }}
+      <SafeAreaView>
+        {loader ? (
+          <Modal
+            transparent={true}
+            style={{ justifyContent: "space-around", alignItems: "center" }}
           >
             <View
               style={{
-                backgroundColor: "#E90064",
-                height: 70,
-                width: 70,
+                backgroundColor: "#FFFFFFaa",
+                flex: 1,
                 justifyContent: "space-around",
                 alignItems: "center",
-                flexDirection: "row",
-                borderRadius: 5,
-                borderColor: "white",
-                borderWidth: 2,
               }}
             >
-              <ActivityIndicator size={30} color={"white"} />
-            </View>
-          </View>
-        </Modal>
-      ) : (
-        <View
-          style={{
-            justifyContent: "space-around",
-            alignItems: "center",
-            // backgroundColor: "orange",
-          }}
-        >
-          <ScrollView>
-            {console.log("myChats: ", myChats)}
-            {myChats.length !== 0 ? (
-              <View>
-                {myChats.map((item, index) => {
-                  console.log("index: ", index);
-                  console.log("item: ", item);
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      style={{
-                        backgroundColor: "white",
-                        flexDirection: "row",
-                        justifyContent: "space-around",
-                        alignItems: "center",
-
-                        width: 350,
-                        minHeight: 70,
-                        padding: 10,
-                        margin: 15,
-                        borderRadius: 4,
-                        shadowColor: "black",
-                        elevation: 15,
-                      }}
-                      onPress={() =>
-                        navigation.navigate("ChatWithClient", {
-                          chat: item,
-                        })
-                      }
-                    >
-                      <UserCircleIcon
-                        size={40}
-                        color={"white"}
-                        style={{
-                          backgroundColor: "#E90064",
-                          borderRadius: 100,
-                        }}
-                      />
-                      <View style={{ width: 180 }}>
-                        <Text
-                          style={{
-                            marginTop: 5,
-                            fontSize: 16,
-                            fontWeight: "600",
-                            textTransform: "capitalize",
-                          }}
-                        >
-                          {item.userId.firstName + item.userId.lastName}
-                        </Text>
-                        <Text
-                          style={{
-                            marginTop: 5,
-                            fontSize: 14,
-                            fontWeight: "400",
-                          }}
-                        >
-                          {item.userId.email}
-                        </Text>
-                        <Text
-                          style={{
-                            marginTop: 5,
-                            fontSize: 14,
-                            fontWeight: "400",
-                          }}
-                        >
-                          {item.userId.profession}
-                        </Text>
-                      </View>
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: "#E90064",
-                          borderRadius: 4,
-                          height: 50,
-                          width: 65,
-                          justifyContent: "space-around",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text style={{ color: "white" }}>delete</Text>
-                      </TouchableOpacity>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            ) : (
               <View
                 style={{
+                  backgroundColor: "#E90064",
+                  height: 70,
+                  width: 70,
                   justifyContent: "space-around",
                   alignItems: "center",
-                  marginTop: 40,
+                  flexDirection: "row",
+                  borderRadius: 5,
+                  borderColor: "white",
+                  borderWidth: 2,
                 }}
               >
-                <Text
+                <ActivityIndicator size={30} color={"white"} />
+              </View>
+            </View>
+          </Modal>
+        ) : (
+          <View
+            style={{
+              justifyContent: "space-around",
+              alignItems: "center",
+              // backgroundColor: "orange",
+            }}
+          >
+            <ScrollView>
+              {console.log("myChats: ", myChats)}
+              {myChats.length !== 0 ? (
+                <View>
+                  {myChats.map((item, index) => {
+                    console.log("index: ", index);
+                    console.log("item: ", item);
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        style={{
+                          backgroundColor: "white",
+                          flexDirection: "row",
+                          justifyContent: "space-around",
+                          alignItems: "center",
+
+                          width: 350,
+                          minHeight: 70,
+                          padding: 10,
+                          margin: 15,
+                          borderRadius: 4,
+                          shadowColor: "black",
+                          elevation: 15,
+                        }}
+                        onPress={() =>
+                          navigation.navigate("ChatWithUser", {
+                            chat: item,
+                          })
+                        }
+                      >
+                        <UserCircleIcon
+                          size={40}
+                          color={"white"}
+                          style={{
+                            backgroundColor: "#E90064",
+                            borderRadius: 100,
+                          }}
+                        />
+                        <View style={{ width: 180 }}>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              fontSize: 16,
+                              fontWeight: "600",
+                              textTransform: "capitalize",
+                            }}
+                          >
+                            {item.userId.firstName + item.userId.lastName}
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              fontSize: 14,
+                              fontWeight: "400",
+                            }}
+                          >
+                            {item.userId.email}
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              fontSize: 14,
+                              fontWeight: "400",
+                            }}
+                          >
+                            {item.userId.profession}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#E90064",
+                            borderRadius: 4,
+                            height: 50,
+                            width: 65,
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text style={{ color: "white" }}>delete</Text>
+                        </TouchableOpacity>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ) : (
+                <View
                   style={{
-                    color: "grey",
-                    fontSize: 17,
-                    fontWeight: "500",
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                    marginTop: 40,
                   }}
                 >
-                  Please make a bid to start the chat!
-                </Text>
-              </View>
-            )}
-          </ScrollView>
-        </View>
-      )}
+                  <Text
+                    style={{
+                      color: "grey",
+                      fontSize: 17,
+                      fontWeight: "500",
+                    }}
+                  >
+                    Please make a bid to start the chat!
+                  </Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        )}
+      </SafeAreaView>
     </KeyboardAwareScrollView>
   );
 };

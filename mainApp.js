@@ -65,7 +65,7 @@ import ViewAssignment from "./components/user/ViewAssignment";
 import ViewUser from "./components/client/ViewUser";
 
 import ChatwithClient from "./components/user/ChatwithClient";
-
+import ChatWithUser from "./components/client/ChatwithUser";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -475,6 +475,7 @@ const MainApp = () => {
           <Stack.Screen name="ClientSignup" component={ClientSignupScreen} />
           <Stack.Screen name="UserSignup" component={UserSignupScreen} />
           <Stack.Screen name="ViewUser" component={ViewUser} />
+          <Stack.Screen name="ChatWithUser" component={ChatWithUser} />
         </Stack.Navigator>
       </NavigationContainer>
     );

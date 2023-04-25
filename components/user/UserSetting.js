@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   ToastAndroid,
   KeyboardAvoidingView,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -28,6 +30,9 @@ import {
   InformationCircleIcon,
   QuestionMarkCircleIcon,
   Bars3BottomLeftIcon,
+  XMarkIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from "react-native-heroicons/outline";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import UserMain from "./UserHomeRootComponent";
@@ -36,6 +41,7 @@ import Malesymbol from "../../images/malesymbol.png";
 import Femalesymbol from "../../images/femalesymbol.png";
 import { useDispatch, useSelector } from "react-redux";
 import { userData } from "../../services/UserData.reducer";
+import { editUserPassService, editUserService } from "../../services/oneForAll";
 
 const UserSetting = () => {
   const navigation = useNavigation();
@@ -84,6 +90,7 @@ const UserSetting = () => {
     });
   });
 
+  const _id = useSelector((state) => state.user)._id;
   const token = useSelector((state) => state.user).token;
   const fname = useSelector((state) => state.user).firstName;
   const gender = useSelector((state) => state.user).gender;
@@ -99,6 +106,18 @@ const UserSetting = () => {
   const experience = useSelector((state) => state.user).experience;
   const profilePic = useSelector((state) => state.user).profilePic;
   console.log("profilePic: ", profilePic);
+
+  // edit loader state
+  const [editLoader, setEditLoad] = useState(false);
+
+  // edit pass
+  const [newPass, setNewPass] = useState("");
+  const [editPassModal, setEditPassModal] = useState(false);
+  const [pwd, showPwd] = useState(true);
+
+  // edit user
+  const [editData, setEditData] = useState("");
+  const [editDataModal, setEditDataModal] = useState(false);
 
   const logOut = () => {
     const onClickOk = () => {
@@ -161,6 +180,92 @@ const UserSetting = () => {
       },
     ]);
   };
+
+  const editPass = async () => {
+    console.log("newPass: ", newPass);
+
+    if (newPass === "") {
+      return ToastAndroid.show(
+        `no password added!`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+
+    setEditLoad(true);
+
+    console.log("_id: ", _id);
+
+    const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+    const result = await editUserPassService({ _id, headers, newPass });
+
+    const { updated, error } = result;
+
+    if (error) {
+      setEditLoad(false);
+      setNewPass("");
+
+      return ToastAndroid.show(
+        `${error}`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+
+    if (updated) {
+      setEditLoad(false);
+      setEditPassModal(false);
+      setNewPass("");
+      const {
+        _id,
+        firstName,
+        lastName,
+        gender,
+        profilePic,
+        email,
+        password,
+        phoneNumber,
+        area,
+        address,
+        city,
+        pincode,
+        profession,
+        experience,
+        about,
+        usertype,
+      } = updated;
+
+      const user = {
+        _id,
+        firstName,
+        lastName,
+        gender,
+        profilePic,
+        email,
+        password,
+        phoneNumber,
+        area,
+        address,
+        city,
+        pincode,
+        profession,
+        experience,
+        about,
+        usertype,
+      };
+
+      dispatch(userData({ user, token }));
+
+      return ToastAndroid.show(
+        `password updated successfully!`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+  };
+
+  const editUser = async () => {};
 
   const userWorkDemo = async () => {};
 
@@ -324,6 +429,7 @@ const UserSetting = () => {
                       alignItems: "center",
                       borderRadius: 9,
                     }}
+                    onPress={() => setEditPassModal(true)}
                   >
                     <Text style={{ fontSize: 16, color: "white" }}>
                       Change password
@@ -346,6 +452,7 @@ const UserSetting = () => {
                         alignItems: "center",
                         borderRadius: 9,
                       }}
+                      onPress={() => setEditDataModal(true)}
                     >
                       <Text style={{ fontSize: 16, color: "white" }}>edit</Text>
                       <PencilSquareIcon size={20} color={"white"} />
@@ -562,6 +669,396 @@ const UserSetting = () => {
             </View>
           </View>
         </SafeAreaView>
+
+        {/* edit password model */}
+        {editPassModal ? (
+          <Modal
+            transparent={true}
+            style={{ justifyContent: "space-around", alignItems: "center" }}
+          >
+            <View
+              style={{
+                backgroundColor: "#FFFFFFaa",
+                flex: 1,
+                justifyContent: "space-around",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#E90064",
+                  height: 270,
+                  width: 300,
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  // flexDirection: "row",
+                  borderRadius: 5,
+                  borderColor: "white",
+                  borderWidth: 2,
+                }}
+              >
+                <View
+                  style={{
+                    width: 270,
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{ backgroundColor: "white", borderRadius: 3 }}
+                    onPress={() => setEditPassModal(false)}
+                  >
+                    <XMarkIcon color={"#E90064"} size={40} />
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    height: 180,
+                    width: 270,
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "400",
+                      color: "white",
+                    }}
+                  >
+                    New Password
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      width: 280,
+                    }}
+                  >
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#E90064",
+                        borderWidth: 2,
+                      }}
+                      secureTextEntry={pwd}
+                      onChangeText={(text) => setNewPass(text)}
+                    />
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "white",
+                        borderRadius: 3,
+                        height: 40,
+                        width: 40,
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                      }}
+                      onPress={() =>
+                        pwd === false ? showPwd(true) : showPwd(false)
+                      }
+                    >
+                      {pwd === false ? (
+                        <EyeSlashIcon size={35} color={"#E90064"} />
+                      ) : (
+                        <EyeIcon size={35} color={"#E90064"} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                  <TouchableOpacity
+                    style={{
+                      marginTop: 20,
+                      backgroundColor: "white",
+                      width: 90,
+                      height: 40,
+                      borderRadius: 3,
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      borderColor: "#E90064",
+                      borderWidth: 2,
+                    }}
+                    onPress={() => editPass()}
+                  >
+                    {editLoader ? (
+                      <ActivityIndicator color={"#E90064"} size={30} />
+                    ) : (
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          fontWeight: "300",
+                        }}
+                      >
+                        done!
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        ) : (
+          ""
+        )}
+
+        {/* edit User model */}
+        {editDataModal ? (
+          <Modal
+            transparent={true}
+            style={{ justifyContent: "space-around", alignItems: "center" }}
+          >
+            <View
+              style={{
+                backgroundColor: "#FFFFFFaa",
+                flex: 1,
+                justifyContent: "space-around",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#B9F3FC",
+                  height: 470,
+                  width: 300,
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  // flexDirection: "row",
+                  borderRadius: 5,
+                  borderColor: "#30E3DF",
+                  borderWidth: 2,
+                }}
+              >
+                <View
+                  style={{
+                    width: 270,
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{ backgroundColor: "white", borderRadius: 3 }}
+                    onPress={() => setEditDataModal(false)}
+                  >
+                    <XMarkIcon color={"#30E3DF"} size={40} />
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    height: 380,
+                    width: 270,
+
+                    // backgroundColor: "green",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "400",
+                    }}
+                  >
+                    Update Profile
+                  </Text>
+                  <View
+                    style={{
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      width: 280,
+                    }}
+                  >
+                    <Text>first name:</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>Last name:</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>Gender:</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>Email</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>phone Number</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>Address</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>Phone</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>Area</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>City</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>pincode</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>Profession</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>experience</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                    />
+                    <Text>About</Text>
+                    <TextInput
+                      style={{
+                        backgroundColor: "white",
+                        padding: 10,
+                        height: 40,
+                        width: 200,
+                        height: 100,
+                        borderRadius: 3,
+                        borderColor: "#30E3DF",
+                        borderWidth: 2,
+                      }}
+                      multiline={true}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    style={{
+                      marginTop: 20,
+                      backgroundColor: "white",
+                      width: 90,
+                      height: 40,
+                      borderRadius: 3,
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      borderColor: "#30E3DF",
+                      borderWidth: 2,
+                    }}
+                    onPress={() => editPass()}
+                  >
+                    {editLoader ? (
+                      <ActivityIndicator color={"#30E3DF"} size={30} />
+                    ) : (
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          fontWeight: "300",
+                        }}
+                      >
+                        done!
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        ) : (
+          ""
+        )}
       </KeyboardAwareScrollView>
     );
   } else {

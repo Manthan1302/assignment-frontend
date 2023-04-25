@@ -35,7 +35,7 @@ import {
 } from "../../services/oneForAll";
 import * as DocumentPicker from "expo-document-picker";
 
-const ChatwithClient = ({ route }) => {
+const ChatWithUser = ({ route }) => {
   useEffect(() => {
     getMyChatofUseronLoad();
   }, []);
@@ -209,7 +209,7 @@ const ChatwithClient = ({ route }) => {
 
     const data = {
       userId,
-      user: clientMsg,
+      client: clientMsg,
     };
 
     const response = await postMessageClient({ data, headers });
@@ -254,7 +254,7 @@ const ChatwithClient = ({ route }) => {
 
             if (item.client) {
               return (
-                <View style={{ alignItems: "flex-start" }} key={index}>
+                <View style={{ alignItems: "flex-end" }} key={index}>
                   <Text
                     style={{
                       backgroundColor: "white",
@@ -275,7 +275,7 @@ const ChatwithClient = ({ route }) => {
               );
             } else if (item.user) {
               return (
-                <View style={{ alignItems: "flex-end" }} key={index}>
+                <View style={{ alignItems: "flex-start" }} key={index}>
                   <Text
                     style={{
                       backgroundColor: "#E90064",
@@ -297,7 +297,7 @@ const ChatwithClient = ({ route }) => {
             } else {
               if (item.clientAttachment) {
                 return (
-                  <View style={{ alignItems: "flex-start" }} key={index}>
+                  <View style={{ alignItems: "flex-end" }} key={index}>
                     <View
                       style={{
                         backgroundColor: "white",
@@ -343,7 +343,7 @@ const ChatwithClient = ({ route }) => {
                 );
               } else if (item.userAttachment) {
                 return (
-                  <View style={{ alignItems: "flex-end" }} key={index}>
+                  <View style={{ alignItems: "flex-start" }} key={index}>
                     <View
                       style={{
                         backgroundColor: "#E90064",
@@ -457,4 +457,4 @@ const ChatwithClient = ({ route }) => {
   );
 };
 
-export default ChatwithClient;
+export default ChatWithUser;

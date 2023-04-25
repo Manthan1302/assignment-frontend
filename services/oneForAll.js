@@ -26,6 +26,37 @@ export const loginServices = async (data) => {
   }
 };
 
+// edit pass
+export const editUserPassService = async ({ _id, headers, newPass }) => {
+  try {
+    const url = `/editPasswordUser/${_id}`;
+    const link = host + url;
+
+    const password = newPass;
+
+    const body = { password };
+
+    const result = await axios.put(link, body, headers);
+    console.log("password was updated: ", result.data);
+
+    if (result.data.error) {
+      const error = result.data.error;
+
+      return { error };
+    }
+
+    const { updated } = result.data;
+
+    return { updated };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const editUserService = async () => {};
+
 export const signupUserServices = async (data) => {
   console.log("------------------------------");
   console.log("data form data:", data);
@@ -434,7 +465,7 @@ export const getMychatWithClientService = async ({ _id, headers }) => {
 // client chat
 export const getAllClientChatService = async ({ headers }) => {
   try {
-    const url = "/getAllClientChats";
+    const url = "/getAllUserChats";
     const link = host + url;
 
     const response = await axios.get(link, headers);
@@ -456,7 +487,7 @@ export const getAllClientChatService = async ({ headers }) => {
 
 export const postMessageClient = async ({ data, headers }) => {
   try {
-    const url = "/postMessageUser";
+    const url = "/postMessageClient";
     const link = host + url;
 
     const reply = await axios.put(link, data, headers);
@@ -478,7 +509,7 @@ export const postMessageClient = async ({ data, headers }) => {
 export const postClientAttachment = async ({ fd, headers }) => {
   console.log("fd: ", fd);
   try {
-    const url = "/sendUserAttachments";
+    const url = "/sendClientAttachments";
     const link = host + url;
 
     const reply = await axios.put(link, fd, headers);
@@ -500,7 +531,7 @@ export const postClientAttachment = async ({ fd, headers }) => {
 
 export const getMychatWithUserService = async ({ _id, headers }) => {
   try {
-    const url = `/getUserchatRoomId/${_id}`;
+    const url = `/getClientchatRoomId/${_id}`;
     const link = host + url;
 
     const reply = await axios.get(link, headers);
