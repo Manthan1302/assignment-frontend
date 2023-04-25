@@ -156,31 +156,9 @@ const UserTaskHistory = () => {
             marginBottom: 140,
           }}
         >
-          {allOrders.map((item, index) => {
-            console.log("item: ", item);
-
-            if (allOrders.length === 0) {
-              return (
-                <View
-                  key={index}
-                  style={{
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                    marginTop: 40,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "grey",
-                      fontSize: 17,
-                      fontWeight: "500",
-                    }}
-                  >
-                    No orders Done yet!
-                  </Text>
-                </View>
-              );
-            } else {
+          {allOrders.length !== 0 ? (
+            allOrders.map((item, index) => {
+              console.log("item: ", item);
               return (
                 <View
                   key={index}
@@ -233,8 +211,26 @@ const UserTaskHistory = () => {
                   </TouchableOpacity>
                 </View>
               );
-            }
-          })}
+            })
+          ) : (
+            <View
+              style={{
+                justifyContent: "space-around",
+                alignItems: "center",
+                marginTop: 40,
+              }}
+            >
+              <Text
+                style={{
+                  color: "grey",
+                  fontSize: 17,
+                  fontWeight: "500",
+                }}
+              >
+                No orders Done yet!
+              </Text>
+            </View>
+          )}
         </View>
       )}
 

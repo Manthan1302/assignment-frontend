@@ -88,8 +88,48 @@ export const signupUserServices = async (data) => {
   }
 };
 
-export const uploadWorkDemo = async () => {
+export const uploadWorkDemo = async ({ fd, token }) => {
   try {
+    const url = "/addWorkDemo";
+    const link = host + url;
+
+    const result = await axios.post(link, fd, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("result: ", result.data);
+
+    const { newWorkImage, error } = result.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { newWorkImage };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const getWorkDemoService = async ({ headers }) => {
+  const url = "/getMyWorkImage";
+  const link = host + url;
+
+  try {
+    const result = await axios.get(link, headers);
+
+    const { myWorkImages, error } = result.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { myWorkImages };
   } catch (error) {
     console.log("error: ", error);
 
@@ -236,10 +276,14 @@ export const getMyBidsService = async ({ headers }) => {
     console.log("-------------------------------------");
     console.log("response: ", response.data);
 
-    const { findMyBid, error } = response.data;
+    const { findMyBid, error, Message } = response.data;
 
     if (error) {
       return { error };
+    }
+
+    if (Message) {
+      return { Message };
     }
 
     return { findMyBid };
@@ -358,12 +402,17 @@ export const deleteMyBidService = async ({ _id, headers }) => {
   }
 };
 
-export const postAssignmentsServices = async (data, header) => {
-  console.log("data form data:", header);
+export const postAssignmentsServices = async ({ fd, token }) => {
+  // console.log("data form data:", header);
   const url = "/uploadTask";
   const link = host + url;
   try {
-    const response = await axios.post(link, data, { header });
+    const response = await axios.post(link, fd, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
     console.log("Response", response);
     return response;
   } catch (error) {
@@ -462,16 +511,14 @@ export const getMychatWithClientService = async ({ _id, headers }) => {
   }
 };
 
-
-export const postOrderServices  =async({_id,headers,data})=>
-{
+export const postOrderServices = async ({ _id, headers, data }) => {
   console.log(_id);
   try {
     const url = `/placeOrder/${_id}`;
     const link = host + url;
 
-    const reply = await axios.put(link,data,headers);
-    const { accepted,rejected, error } = reply.data;
+    const reply = await axios.put(link, data, headers);
+    const { accepted, rejected, error } = reply.data;
     if (error) {
       return { error };
     }
@@ -543,16 +590,13 @@ export const postClientAttachment = async ({ fd, headers }) => {
       return { error };
     }
 
-
-    return { accepted,rejected };
+    return { accepted, rejected };
   } catch (error) {
     console.log("error: ", error);
 
-    return { error }
+    return { error };
   }
-
-}
-
+};
 
 export const getMychatWithUserService = async ({ _id, headers }) => {
   try {
@@ -574,4 +618,3 @@ export const getMychatWithUserService = async ({ _id, headers }) => {
     return { error };
   }
 };
-

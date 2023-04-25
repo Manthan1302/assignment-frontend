@@ -29,18 +29,23 @@ import {
   TrashIcon,
   XMarkIcon,
 } from "react-native-heroicons/outline";
-import {  getBidsonTaskServices,postOrderServices } from "../../services/oneForAll";
+import {
+  getBidsonTaskServices,
+  postOrderServices,
+} from "../../services/oneForAll";
 import {
   Bars3CenterLeftIcon,
   DocumentTextIcon,
 } from "react-native-heroicons/solid";
 
-const ClientBid = ({route}) => {
+const ClientBid = ({ route }) => {
   const navigation = useNavigation();
-  const {assignment} = route.params;
-  console.log("🚀 ~ file: ClientBid.js:40 ~ ClientBid ~ assignment:", assignment)
+  const { assignment } = route.params;
+  console.log(
+    "🚀 ~ file: ClientBid.js:40 ~ ClientBid ~ assignment:",
+    assignment
+  );
 
-  
   const clientToken = useSelector((state) => state.client).token;
   const [loader, setLoader] = useState(false);
   const [myBids, setMyBids] = useState([]);
@@ -102,24 +107,26 @@ const ClientBid = ({route}) => {
       ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
     }
   };
-  
-  const acceptBid= async(_id)=>{
-    try{
-     const onClickOk= async()=>
-     {
-      
-      const headers = { headers: { Authorization: `Bearer ${clientToken}` } };
-      // console.log("🚀 ~ file: ClientBid.js:109 ~ acceptBid ~ _id:", _id)
-      const bidStatus= "accepted";
-      const data = {bidStatus};
-      const result = await postOrderServices({_id,headers,data});
 
-      const {accepted,rejected,error} = result;
+  const acceptBid = async (_id) => {
+    try {
+      const onClickOk = async () => {
+        const headers = { headers: { Authorization: `Bearer ${clientToken}` } };
+        // console.log("🚀 ~ file: ClientBid.js:109 ~ acceptBid ~ _id:", _id)
+        const bidStatus = "accepted";
+        const data = { bidStatus };
+        const result = await postOrderServices({ _id, headers, data });
 
-      if (error) {
-        ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
-      }
-     }
+        const { accepted, rejected, error } = result;
+
+        if (error) {
+          ToastAndroid.show(
+            `${error}`,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        }
+      };
 
       Alert.alert("Accept Bid", "Are you sure , you want to Accept Bid ?", [
         {
@@ -132,58 +139,56 @@ const ClientBid = ({route}) => {
           onPress: () => onClickOk(),
         },
       ]);
-    }
-    catch(error)
-    {
+    } catch (error) {
       console.log("error: ", error);
     }
-  }
+  };
 
+  const rejectBid = (_id) => {
+    try {
+      const onClickOk = async () => {
+        console.log(_id);
+        const headers = { headers: { Authorization: `Bearer ${clientToken}` } };
+        const bidStatus = "rejected";
+        const data = { bidStatus };
+        const result = await postOrderServices({ _id, headers, data });
 
- const rejectBid=(_id)=>{
-  try{
-    const onClickOk= async()=>
-    {
-     
-     console.log(_id);
-     const headers = { headers: { Authorization: `Bearer ${clientToken}` } };
-     const bidStatus= "rejected";
-     const data = {bidStatus};
-     const result = await postOrderServices({_id,headers,data});
+        const { accepted, rejected, error } = result;
 
-     const {accepted,rejected,error} = result;
+        if (error) {
+          ToastAndroid.show(
+            `${error}`,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        }
+      };
 
-     if (error) {
-       ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
-     }
+      Alert.alert("Reject Bid", "Are you sure , you want to Reject Bid ?", [
+        {
+          text: "Cancel",
+          onPress: () => null,
+          style: "cancel",
+        },
+        {
+          text: "Ok",
+          onPress: () => onClickOk(),
+        },
+      ]);
+    } catch (error) {
+      console.log("error: ", error);
     }
-
-     Alert.alert("Reject Bid", "Are you sure , you want to Reject Bid ?", [
-       {
-         text: "Cancel",
-         onPress: () => null,
-         style: "cancel",
-       },
-       {
-         text: "Ok",
-         onPress: () => onClickOk(),
-       },
-     ]);
-   }
-   catch(error)
-   {
-     console.log("error: ", error);
-   }
-  }
+  };
 
   return (
-    <KeyboardAwareScrollView 
-         refreshControl={
+    <KeyboardAwareScrollView
+      refreshControl={
         <RefreshControl
           refreshing={refresh}
           onRefresh={() => getParticularTaskBid()}
         />
-      }>
+      }
+    >
       {loader ? (
         <Modal
           transparent={true}
@@ -220,245 +225,273 @@ const ClientBid = ({route}) => {
             marginBottom: 20,
           }}
         >
-          {myBids.map((item, index) => {
-            console.log("---------------------------------------------");
-            console.log("item: ", item);
+          {myBids.length !== 0 ? (
+            myBids.map((item, index) => {
+              console.log("---------------------------------------------");
+              console.log("item: ", item);
 
-            return (
-             
-              <View
-                key={index}
-                style={{
-                  justifyContent: "space-around",
-                  alignItems: "center",
-                  margin: 15,
-                }}
-              >
-                 {item.bidStatus === "pending" ? (
-                 <View
-                 style={{
-                   backgroundColor: "white",
-                   flexDirection: "row",
-                   justifyContent: "space-around",
-                   alignItems: "center",
-                   width: 350,
-                   borderRadius: 3,
-                   padding: 7,
-                   elevation: 15,
-                   shadowColor: "#748c94",
-                 }}
-               >
-                 <NewspaperIcon color={"#E90064"} height={40} width={40} />
-                 <View
-                   style={{
-                     // backgroundColor: "green",
-                     width: 200,
-                     minHeight: 80,
-                     maxHeight: 200,
-                     alignItems: "flex-start",
-                     justifyContent: "space-around",
-                   }}
-                 >
-                   <View
-                     style={{
-                       justifyContent: "space-around",
-                       alignItems: "center",
-                       flexDirection: "row",
-                     }}
-                   >
-                     <CurrencyRupeeIcon
-                       color={"#E90064"}
-                       height={20}
-                       width={20}
-                     />
-                     <Text>{item.finalPrice}</Text>
-                   </View>
-                   <Text> {item.userMessage}</Text>
-                   <Text>
-                     {item.bidStatus === "pending" ? (
-                       <Text style={{ color: "red" }}>pending *</Text>
-                     ) : (
-                       <Text style={{ color: "green" }}>accepted *</Text>
-                     )}
-                   </Text>
-                  <View style={{marginTop:15,marginLeft:35}}>
-
-                  <TouchableOpacity
-                   style={{
-                     backgroundColor: "#E90064",
-                     width: 60,
-                     height: 40,
-                     justifyContent: "space-around",
-                     alignItems: "center",
-                     borderRadius: 3,
-                     color:"white",
-                   }}
-                   onPress={()=>acceptBid(item._id)}
-                 >
-                   <Text  style={{
-                       color: "white",
-                       fontSize: 16,
-                       fontWeight: "500",
-                     }}>Accept</Text></TouchableOpacity>
-                   <TouchableOpacity
-                   style={{
-                     backgroundColor: "#E90064",
-                     width: 60,
-                     height: 40,
-                     justifyContent: "space-around",
-                     alignItems: "center",
-                     borderRadius: 3,
-                     color:"white",
-                     marginLeft:70,
-                     marginTop:-40
-                   }}
-                   onPress={()=>rejectBid(item._id)}
-                 ><Text  style={{
-                   color: "white",
-                   fontSize: 16,
-                   fontWeight: "500",
-                 }}>Reject</Text></TouchableOpacity>
-                   </View>
-                 </View>
-                 <TouchableOpacity
-                   style={{
-                     backgroundColor: "#E90064",
-                     width: 60,
-                     height: 40,
-                     justifyContent: "space-around",
-                     alignItems: "center",
-                     borderRadius: 3,
-                   }}
-                   onPress={() => {
-                     setModalStatus(true), setBidInfo(item);
-                   }}
-                 >
-                   <Text
-                     style={{
-                       color: "white",
-                       fontSize: 16,
-                       fontWeight: "500",
-                     }}
-                   >
-                     info
-                   </Text>
-                 </TouchableOpacity>
-               </View>
-              ) : (
+              return (
                 <View
-                style={{
-                  backgroundColor: "white",
-                  flexDirection: "row",
-                  justifyContent: "space-around",
-                  alignItems: "center",
-                  width: 350,
-                  borderRadius: 3,
-                  padding: 7,
-                  elevation: 15,
-                  shadowColor: "#748c94",
-                }}
-              >
-                <NewspaperIcon color={"#E90064"} height={40} width={40} />
-                <View
+                  key={index}
                   style={{
-                    // backgroundColor: "green",
-                    width: 200,
-                    minHeight: 80,
-                    maxHeight: 200,
-                    alignItems: "flex-start",
                     justifyContent: "space-around",
+                    alignItems: "center",
+                    margin: 15,
                   }}
                 >
-                  <View
+                  {item.bidStatus === "pending" ? (
+                    <View
+                      style={{
+                        backgroundColor: "white",
+                        flexDirection: "row",
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        width: 350,
+                        borderRadius: 3,
+                        padding: 7,
+                        elevation: 15,
+                        shadowColor: "#748c94",
+                      }}
+                    >
+                      <NewspaperIcon color={"#E90064"} height={40} width={40} />
+                      <View
+                        style={{
+                          // backgroundColor: "green",
+                          width: 200,
+                          minHeight: 80,
+                          maxHeight: 200,
+                          alignItems: "flex-start",
+                          justifyContent: "space-around",
+                        }}
+                      >
+                        <View
+                          style={{
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            flexDirection: "row",
+                          }}
+                        >
+                          <CurrencyRupeeIcon
+                            color={"#E90064"}
+                            height={20}
+                            width={20}
+                          />
+                          <Text>{item.finalPrice}</Text>
+                        </View>
+                        <Text> {item.userMessage}</Text>
+                        <Text>
+                          {item.bidStatus === "pending" ? (
+                            <Text style={{ color: "red" }}>pending *</Text>
+                          ) : (
+                            <Text style={{ color: "green" }}>accepted *</Text>
+                          )}
+                        </Text>
+                        <View style={{ marginTop: 15, marginLeft: 35 }}>
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: "#E90064",
+                              width: 60,
+                              height: 40,
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              borderRadius: 3,
+                              color: "white",
+                            }}
+                            onPress={() => acceptBid(item._id)}
+                          >
+                            <Text
+                              style={{
+                                color: "white",
+                                fontSize: 16,
+                                fontWeight: "500",
+                              }}
+                            >
+                              Accept
+                            </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: "#E90064",
+                              width: 60,
+                              height: 40,
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              borderRadius: 3,
+                              color: "white",
+                              marginLeft: 70,
+                              marginTop: -40,
+                            }}
+                            onPress={() => rejectBid(item._id)}
+                          >
+                            <Text
+                              style={{
+                                color: "white",
+                                fontSize: 16,
+                                fontWeight: "500",
+                              }}
+                            >
+                              Reject
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "#E90064",
+                          width: 60,
+                          height: 40,
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          borderRadius: 3,
+                        }}
+                        onPress={() => {
+                          setModalStatus(true), setBidInfo(item);
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 16,
+                            fontWeight: "500",
+                          }}
+                        >
+                          info
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        backgroundColor: "white",
+                        flexDirection: "row",
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        width: 350,
+                        borderRadius: 3,
+                        padding: 7,
+                        elevation: 15,
+                        shadowColor: "#748c94",
+                      }}
+                    >
+                      <NewspaperIcon color={"#E90064"} height={40} width={40} />
+                      <View
+                        style={{
+                          // backgroundColor: "green",
+                          width: 200,
+                          minHeight: 80,
+                          maxHeight: 200,
+                          alignItems: "flex-start",
+                          justifyContent: "space-around",
+                        }}
+                      >
+                        <View
+                          style={{
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            flexDirection: "row",
+                          }}
+                        >
+                          <CurrencyRupeeIcon
+                            color={"#E90064"}
+                            height={20}
+                            width={20}
+                          />
+                          <Text>{item.finalPrice}</Text>
+                        </View>
+                        <Text> {item.userMessage}</Text>
+                        <Text>
+                          {item.bidStatus === "pending" ? (
+                            <Text style={{ color: "red" }}>pending *</Text>
+                          ) : (
+                            <Text style={{ color: "green" }}>accepted *</Text>
+                          )}
+                        </Text>
+                        {/* <View style={{marginTop:15,marginLeft:35}}>
+  
+                   <TouchableOpacity
                     style={{
+                      backgroundColor: "#E90064",
+                      width: 60,
+                      height: 40,
                       justifyContent: "space-around",
                       alignItems: "center",
-                      flexDirection: "row",
+                      borderRadius: 3,
+                      color:"white",
                     }}
+                    onPress={()=>acceptBid(item._id)}
                   >
-                    <CurrencyRupeeIcon
-                      color={"#E90064"}
-                      height={20}
-                      width={20}
-                    />
-                    <Text>{item.finalPrice}</Text>
-                  </View>
-                  <Text> {item.userMessage}</Text>
-                  <Text>
-                    {item.bidStatus === "pending" ? (
-                      <Text style={{ color: "red" }}>pending *</Text>
-                    ) : (
-                      <Text style={{ color: "green" }}>accepted *</Text>
-                    )}
-                  </Text>
-                 {/* <View style={{marginTop:15,marginLeft:35}}>
-
-                 <TouchableOpacity
-                  style={{
-                    backgroundColor: "#E90064",
-                    width: 60,
-                    height: 40,
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                    borderRadius: 3,
-                    color:"white",
-                  }}
-                  onPress={()=>acceptBid(item._id)}
-                >
-                  <Text  style={{
-                      color: "white",
-                      fontSize: 16,
-                      fontWeight: "500",
-                    }}>Accept</Text></TouchableOpacity>
-                  <TouchableOpacity
-                  style={{
-                    backgroundColor: "#E90064",
-                    width: 60,
-                    height: 40,
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                    borderRadius: 3,
-                    color:"white",
-                    marginLeft:70,
-                    marginTop:-40
-                  }}
-                  onPress={()=>rejectBid(item._id)}
-                ><Text  style={{
-                  color: "white",
-                  fontSize: 16,
-                  fontWeight: "500",
-                }}>Reject</Text></TouchableOpacity>
-                  </View> */}
-                </View>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: "#E90064",
-                    width: 60,
-                    height: 40,
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                    borderRadius: 3,
-                  }}
-                  onPress={() => {
-                    setModalStatus(true), setBidInfo(item);
-                  }}
-                >
-                  <Text
+                    <Text  style={{
+                        color: "white",
+                        fontSize: 16,
+                        fontWeight: "500",
+                      }}>Accept</Text></TouchableOpacity>
+                    <TouchableOpacity
                     style={{
-                      color: "white",
-                      fontSize: 16,
-                      fontWeight: "500",
+                      backgroundColor: "#E90064",
+                      width: 60,
+                      height: 40,
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      borderRadius: 3,
+                      color:"white",
+                      marginLeft:70,
+                      marginTop:-40
                     }}
-                  >
-                    info
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              )}
-                
-              </View>
-            );
-          })}
+                    onPress={()=>rejectBid(item._id)}
+                  ><Text  style={{
+                    color: "white",
+                    fontSize: 16,
+                    fontWeight: "500",
+                  }}>Reject</Text></TouchableOpacity>
+                    </View> */}
+                      </View>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "#E90064",
+                          width: 60,
+                          height: 40,
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          borderRadius: 3,
+                        }}
+                        onPress={() => {
+                          setModalStatus(true), setBidInfo(item);
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 16,
+                            fontWeight: "500",
+                          }}
+                        >
+                          info
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              );
+            })
+          ) : (
+            <View
+              style={{
+                justifyContent: "space-around",
+                alignItems: "center",
+                marginTop: 40,
+              }}
+            >
+              <Text
+                style={{
+                  color: "grey",
+                  fontSize: 17,
+                  fontWeight: "500",
+                }}
+              >
+                No Bids placed yet!
+              </Text>
+            </View>
+          )}
 
           {modalStatus ? (
             <Modal

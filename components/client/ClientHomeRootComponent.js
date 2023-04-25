@@ -182,7 +182,7 @@ const ClientMain = () => {
                           marginLeft: "auto",
                           marginRight: "auto",
                         }}
-                      ></Image>
+                      />
                     </View>
                   </View>
                   <Text>{"\n"}</Text>

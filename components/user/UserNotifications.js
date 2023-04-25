@@ -75,26 +75,34 @@ const UserNotifications = () => {
   }, []);
 
   const getMyBids = async () => {
-    setLoader(true);
-    const headers = { headers: { Authorization: `Bearer ${userToken}` } };
+    try {
+      setLoader(true);
+      const headers = { headers: { Authorization: `Bearer ${userToken}` } };
 
-    const result = await getMyBidsService({ headers });
+      const result = await getMyBidsService({ headers });
 
-    const { findMyBid, error } = result;
+      const { findMyBid, error, Message } = result;
 
-    findMyBid.sort(function (a, b) {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
+      Message ? setMyBids([]) : "";
 
-      return dateA - dateB;
-    });
+      findMyBid
+        ? findMyBid.sort(function (a, b) {
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
 
-    findMyBid ? setMyBids(findMyBid) : "";
+            return dateA - dateB;
+          })
+        : "";
 
-    findMyBid ? setLoader(false) : setLoader(false);
+      findMyBid ? setMyBids(findMyBid) : setMyBids([]);
 
-    if (error) {
-      ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+      findMyBid ? setLoader(false) : setLoader(false);
+
+      if (error) {
+        ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+      }
+    } catch (e) {
+      console.log("e: ", e);
     }
   };
 
@@ -136,95 +144,121 @@ const UserNotifications = () => {
             marginBottom: 20,
           }}
         >
-          {myBids.map((item, index) => {
-            console.log("---------------------------------------------");
-            console.log("item: ", item);
+          <View>
+            {myBids.length !== 0 ? (
+              myBids.map((item, index) => {
+                console.log("---------------------------------------------");
+                console.log("item: ", item);
 
-            if (item.bidStatus === "accepted") {
-              return (
-                <View
-                  key={index}
-                  style={{
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                    margin: 15,
-                  }}
-                >
-                  <View
-                    style={{
-                      backgroundColor: "white",
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                      alignItems: "center",
-                      width: 350,
-                      borderRadius: 3,
-                      padding: 7,
-                      elevation: 15,
-                      shadowColor: "#748c94",
-                    }}
-                  >
-                    <NewspaperIcon color={"#E90064"} height={40} width={40} />
+                if (item.bidStatus === "accepted") {
+                  return (
                     <View
+                      key={index}
                       style={{
-                        // backgroundColor: "green",
-                        width: 200,
-                        minHeight: 80,
-                        maxHeight: 200,
-                        alignItems: "flex-start",
                         justifyContent: "space-around",
+                        alignItems: "center",
+                        margin: 15,
                       }}
                     >
                       <View
                         style={{
+                          backgroundColor: "white",
+                          flexDirection: "row",
                           justifyContent: "space-around",
                           alignItems: "center",
-                          flexDirection: "row",
+                          width: 350,
+                          borderRadius: 3,
+                          padding: 7,
+                          elevation: 15,
+                          shadowColor: "#748c94",
                         }}
                       >
-                        <CurrencyRupeeIcon
+                        <NewspaperIcon
                           color={"#E90064"}
-                          height={20}
-                          width={20}
+                          height={40}
+                          width={40}
                         />
-                        <Text>{item.finalPrice}</Text>
+                        <View
+                          style={{
+                            // backgroundColor: "green",
+                            width: 200,
+                            minHeight: 80,
+                            maxHeight: 200,
+                            alignItems: "flex-start",
+                            justifyContent: "space-around",
+                          }}
+                        >
+                          <View
+                            style={{
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              flexDirection: "row",
+                            }}
+                          >
+                            <CurrencyRupeeIcon
+                              color={"#E90064"}
+                              height={20}
+                              width={20}
+                            />
+                            <Text>{item.finalPrice}</Text>
+                          </View>
+                          <Text> {item.userMessage}</Text>
+                          <Text>
+                            {item.bidStatus === "pending" ? (
+                              <Text style={{ color: "red" }}>pending *</Text>
+                            ) : (
+                              <Text style={{ color: "green" }}>accepted *</Text>
+                            )}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#E90064",
+                            width: 60,
+                            height: 40,
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            borderRadius: 3,
+                          }}
+                          onPress={() => {
+                            setModalStatus(true), setBidInfo(item);
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 16,
+                              fontWeight: "500",
+                            }}
+                          >
+                            info
+                          </Text>
+                        </TouchableOpacity>
                       </View>
-                      <Text> {item.userMessage}</Text>
-                      <Text>
-                        {item.bidStatus === "pending" ? (
-                          <Text style={{ color: "red" }}>pending *</Text>
-                        ) : (
-                          <Text style={{ color: "green" }}>accepted *</Text>
-                        )}
-                      </Text>
                     </View>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: "#E90064",
-                        width: 60,
-                        height: 40,
-                        justifyContent: "space-around",
-                        alignItems: "center",
-                        borderRadius: 3,
-                      }}
-                      onPress={() => {
-                        setModalStatus(true), setBidInfo(item);
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "white",
-                          fontSize: 16,
-                          fontWeight: "500",
-                        }}
-                      >
-                        info
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              );
-            }
-          })}
+                  );
+                }
+              })
+            ) : (
+              <View
+                style={{
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  marginTop: 40,
+                }}
+              >
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  No Bids placed yet!
+                </Text>
+              </View>
+            )}
+          </View>
 
           {modalStatus ? (
             <Modal

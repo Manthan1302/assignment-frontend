@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -33,6 +34,7 @@ import {
   XMarkIcon,
   EyeIcon,
   EyeSlashIcon,
+  DocumentPlusIcon,
 } from "react-native-heroicons/outline";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import UserMain from "./UserHomeRootComponent";
@@ -41,7 +43,14 @@ import Malesymbol from "../../images/malesymbol.png";
 import Femalesymbol from "../../images/femalesymbol.png";
 import { useDispatch, useSelector } from "react-redux";
 import { userData } from "../../services/UserData.reducer";
-import { editUserPassService, editUserService } from "../../services/oneForAll";
+import {
+  editUserPassService,
+  editUserService,
+  getWorkDemoService,
+  uploadWorkDemo,
+} from "../../services/oneForAll";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
 const UserSetting = () => {
   const navigation = useNavigation();
@@ -65,6 +74,10 @@ const UserSetting = () => {
     "hardwareBackPress",
     backAction
   );
+
+  useEffect(() => {
+    getWorkModel();
+  }, []);
 
   useLayoutEffect(() => {
     const backAction = () => {
@@ -114,6 +127,13 @@ const UserSetting = () => {
   const [newPass, setNewPass] = useState("");
   const [editPassModal, setEditPassModal] = useState(false);
   const [pwd, showPwd] = useState(true);
+
+  // work demo
+  const [workImage, setWorkImage] = useState("");
+  const [workDemoModel, setWorkDemoModel] = useState("");
+  const [workLoad, setWorkLoad] = useState(false);
+
+  const [myWorkImage, setMyWorkImage] = useState([]);
 
   // edit user
   const [editData, setEditData] = useState("");
@@ -267,7 +287,79 @@ const UserSetting = () => {
 
   const editUser = async () => {};
 
-  const userWorkDemo = async () => {};
+  const openImageLibrary = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("sorry , we need camera roll permission to make this work");
+    }
+
+    if (status === "granted") {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+      });
+
+      console.log("result: ", result);
+
+      if (!result.canceled) {
+        setWorkImage(result.uri);
+        console.log("result.assets: ", result.uri);
+      }
+    }
+  };
+
+  const getWorkModel = async () => {
+    const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+    const result = await getWorkDemoService({ headers });
+
+    const { myWorkImages, error } = result;
+
+    if (error) {
+      console.log(error);
+    }
+
+    setMyWorkImage(myWorkImages);
+  };
+
+  const userWorkDemo = async () => {
+    setWorkLoad(true);
+
+    const fd = new FormData();
+
+    fd.append("workDemo", {
+      uri: workImage,
+      name: new Date() + "_workDemo",
+      type: "image/jpg",
+    });
+
+    console.log("fd: ", fd);
+
+    const result = await uploadWorkDemo({ fd, token });
+
+    const { newWorkImage, error } = result;
+
+    if (error) {
+      setWorkDemoModel(false);
+      setWorkLoad(false);
+      return ToastAndroid.show(
+        "error : wrokdemo",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+
+    if (newWorkImage) {
+      setWorkDemoModel(false);
+      setWorkLoad(false);
+      return ToastAndroid.show(
+        "Image uploaded successfully!",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+  };
 
   if (token !== "") {
     return (
@@ -333,11 +425,22 @@ const UserSetting = () => {
                 <View
                   style={{
                     height: 190,
-                    backgroundColor: "green",
                     marginBottom: 10,
                   }}
                 >
-                  <Text>images</Text>
+                  {myWorkImage.map((item, index) => {
+                    console.log("item: ", item);
+                    return (
+                      <ScrollView horizontal={true} key={index}>
+                        <Image
+                          source={{ uri: item.workImage }}
+                          style={{
+                            height: 190,
+                          }}
+                        />
+                      </ScrollView>
+                    );
+                  })}
                 </View>
                 <View
                   style={{
@@ -355,6 +458,7 @@ const UserSetting = () => {
                       width: 90,
                       borderRadius: 5,
                     }}
+                    onPress={() => setWorkDemoModel(true)}
                   >
                     <Text style={{ color: "white", fontSize: 16 }}>Upload</Text>
                   </TouchableOpacity>
@@ -803,8 +907,8 @@ const UserSetting = () => {
           ""
         )}
 
-        {/* edit User model */}
-        {editDataModal ? (
+        {/*  work demo model */}
+        {workDemoModel ? (
           <Modal
             transparent={true}
             style={{ justifyContent: "space-around", alignItems: "center" }}
@@ -819,14 +923,14 @@ const UserSetting = () => {
             >
               <View
                 style={{
-                  backgroundColor: "#B9F3FC",
-                  height: 470,
+                  backgroundColor: "#E90064",
+                  height: 300,
                   width: 300,
                   justifyContent: "space-around",
                   alignItems: "center",
                   // flexDirection: "row",
                   borderRadius: 5,
-                  borderColor: "#30E3DF",
+                  borderColor: "white",
                   borderWidth: 2,
                 }}
               >
@@ -838,221 +942,89 @@ const UserSetting = () => {
                 >
                   <TouchableOpacity
                     style={{ backgroundColor: "white", borderRadius: 3 }}
-                    onPress={() => setEditDataModal(false)}
+                    onPress={() => setWorkDemoModel(false)}
                   >
-                    <XMarkIcon color={"#30E3DF"} size={40} />
+                    <XMarkIcon color={"#E90064"} size={40} />
                   </TouchableOpacity>
                 </View>
+
                 <View
                   style={{
-                    height: 380,
-                    width: 270,
-
-                    // backgroundColor: "green",
+                    alignItems: "center",
+                    justifyContent: "space-around",
+                    marginTop: 20,
                   }}
                 >
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: "400",
-                    }}
-                  >
-                    Update Profile
-                  </Text>
-                  <View
-                    style={{
-                      justifyContent: "space-around",
-                      alignItems: "center",
-                      width: 280,
-                    }}
-                  >
-                    <Text>first name:</Text>
-                    <TextInput
+                  {workImage ? (
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#E90064",
+                        width: 150,
+                        height: 150,
+                        alignItems: "center",
+                        justifyContent: "space-around",
+                        borderRadius: 5,
+                      }}
+                      onPress={openImageLibrary}
+                    >
+                      <DocumentPlusIcon
+                        color={"white"}
+                        height={50}
+                        width={50}
+                      />
+                      <Text style={{ color: "white" }}>picture uploaded!</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
                       style={{
                         backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
+                        width: 150,
+                        height: 150,
+                        alignItems: "center",
+                        justifyContent: "space-around",
+                        borderRadius: 5,
+                        elevation: 15,
+                        shadowColor: "grey",
                       }}
-                    />
-                    <Text>Last name:</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>Gender:</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>Email</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>phone Number</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>Address</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>Phone</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>Area</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>City</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>pincode</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>Profession</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>experience</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                    />
-                    <Text>About</Text>
-                    <TextInput
-                      style={{
-                        backgroundColor: "white",
-                        padding: 10,
-                        height: 40,
-                        width: 200,
-                        height: 100,
-                        borderRadius: 3,
-                        borderColor: "#30E3DF",
-                        borderWidth: 2,
-                      }}
-                      multiline={true}
-                    />
-                  </View>
-                  <TouchableOpacity
-                    style={{
-                      marginTop: 20,
-                      backgroundColor: "white",
-                      width: 90,
-                      height: 40,
-                      borderRadius: 3,
-                      justifyContent: "space-around",
-                      alignItems: "center",
-                      borderColor: "#30E3DF",
-                      borderWidth: 2,
-                    }}
-                    onPress={() => editPass()}
-                  >
-                    {editLoader ? (
-                      <ActivityIndicator color={"#30E3DF"} size={30} />
-                    ) : (
-                      <Text
-                        style={{
-                          fontSize: 17,
-                          fontWeight: "300",
-                        }}
-                      >
-                        done!
-                      </Text>
-                    )}
-                  </TouchableOpacity>
+                      onPress={openImageLibrary}
+                    >
+                      <DocumentPlusIcon
+                        color={"#E90064"}
+                        height={50}
+                        width={50}
+                      />
+                      <Text style={{ color: "#E90064" }}> work demo</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
+
+                <TouchableOpacity
+                  style={{
+                    marginTop: 20,
+                    backgroundColor: "white",
+                    width: 90,
+                    height: 40,
+                    borderRadius: 3,
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                    borderColor: "#E90064",
+                    borderWidth: 2,
+                  }}
+                  onPress={() => userWorkDemo()}
+                >
+                  {workLoad ? (
+                    <ActivityIndicator color={"#E90064"} size={30} />
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 17,
+                        fontWeight: "300",
+                      }}
+                    >
+                      submit
+                    </Text>
+                  )}
+                </TouchableOpacity>
               </View>
             </View>
           </Modal>
