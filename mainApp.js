@@ -61,7 +61,11 @@ import UserNotifications from "./components/user/UserNotifications";
 import UserPayments from "./components/user/UserPayments";
 import UserBids from "./components/user/UserBids";
 import ViewAssignment from "./components/user/ViewAssignment";
+
+import ViewUser from "./components/client/ViewUser";
+
 import ChatwithClient from "./components/user/ChatwithClient";
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -470,6 +474,7 @@ const MainApp = () => {
           <Stack.Screen name="theOwnerAdmin" component={AdminScreen} />
           <Stack.Screen name="ClientSignup" component={ClientSignupScreen} />
           <Stack.Screen name="UserSignup" component={UserSignupScreen} />
+          <Stack.Screen name="ViewUser" component={ViewUser} />
         </Stack.Navigator>
       </NavigationContainer>
     );

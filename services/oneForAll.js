@@ -111,17 +111,16 @@ export const getAllAssingmentServices = async () => {
   }
 };
 
-export const getAllUsersServices = async () => {
-  console.log("------------------------------");
+export const getAllUsersServices = async ({ headers }) => {
   const url = "/getAllUsersClient";
   const link = host + url;
   try {
-    const response = await axios.get(link);
-    const theData = response.data;
-
-    return { theData };
+    const response = await axios.get(link, headers);
+    const users = response.data.allusers;
+    console.log("response.data", response.data.allusers);
+    return { users };
   } catch (error) {
-    console.log("error:", error);
+    console.log("error1:", error);
     return { error };
   }
 };
@@ -241,6 +240,27 @@ export const getOrdersForUserService = async ({ headers }) => {
   }
 };
 
+export const getSearchUserServices = async ({ searchUser }) => {
+  console.log("searchUser: ", searchUser);
+  try {
+    const url = `/searchUser/${searchUser}`;
+    const link = host + url;
+
+    const response = await axios.get(link);
+    if (response.data.error) {
+      const error = response.data.error;
+      return { error };
+    }
+    const allSearchUser = response.data.found;
+
+    return { allSearchUser };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
 export const onWorkCompleteService = async ({ _id, headers }) => {
   const url = `/onCompleteTask/${_id}`;
   const link = host + url;
@@ -273,6 +293,19 @@ export const onWorkCompleteService = async ({ _id, headers }) => {
   }
 };
 
+export const deleteAssignmentServices = async (header, id) => {
+  try {
+    const url = `/deleteMyTask/${id}`;
+    const link = host + url;
+    const response = await axios.delete(link, header);
+    return response;
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
 export const deleteMyBidService = async ({ _id, headers }) => {
   try {
     const url = `/deleteMyBid/${_id}`;
@@ -287,6 +320,21 @@ export const deleteMyBidService = async ({ _id, headers }) => {
     }
 
     return { deletedBid };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const postAssignmentsServices = async (data, header) => {
+  console.log("data form data:", header);
+  const url = "/uploadTask";
+  const link = host + url;
+  try {
+    const response = await axios.post(link, data, { header });
+    console.log("Response", response);
+    return response;
   } catch (error) {
     console.log("error: ", error);
 
