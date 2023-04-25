@@ -57,7 +57,14 @@ export const signupUserServices = async (data) => {
   }
 };
 
-export const uploadWorkDemo = async () => {};
+export const uploadWorkDemo = async () => {
+  try {
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
 
 export const signUpClientServices = async (data) => {
   console.log("------------------------------");
@@ -287,6 +294,8 @@ export const deleteMyBidService = async ({ _id, headers }) => {
   }
 };
 
+// user chat and get
+
 export const getAllUserChatService = async ({ headers }) => {
   try {
     const url = "/getAllClientChats";
@@ -309,7 +318,6 @@ export const getAllUserChatService = async ({ headers }) => {
   }
 };
 
-// user chat and get
 export const postMessageUser = async ({ data, headers }) => {
   try {
     const url = "/postMessageUser";
@@ -355,6 +363,94 @@ export const postUserAttachment = async ({ fd, headers }) => {
 };
 
 export const getMychatWithClientService = async ({ _id, headers }) => {
+  try {
+    const url = `/getUserchatRoomId/${_id}`;
+    const link = host + url;
+
+    const reply = await axios.get(link, headers);
+
+    const { chatRoom, error } = reply.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { chatRoom };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+// client chat
+export const getAllClientChatService = async ({ headers }) => {
+  try {
+    const url = "/getAllClientChats";
+    const link = host + url;
+
+    const response = await axios.get(link, headers);
+    console.log("response: ", response.data);
+
+    const { allChats, error } = response.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { allChats };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const postMessageClient = async ({ data, headers }) => {
+  try {
+    const url = "/postMessageUser";
+    const link = host + url;
+
+    const reply = await axios.put(link, data, headers);
+
+    const { newMessage, error } = reply.data;
+
+    if (error) {
+      return { error };
+    }
+
+    return { newMessage };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const postClientAttachment = async ({ fd, headers }) => {
+  console.log("fd: ", fd);
+  try {
+    const url = "/sendUserAttachments";
+    const link = host + url;
+
+    const reply = await axios.put(link, fd, headers);
+
+    const { newMessage, error } = reply.data;
+    console.log("reply.data: ", reply.data);
+
+    if (error) {
+      return { error };
+    }
+
+    return { newMessage };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
+export const getMychatWithUserService = async ({ _id, headers }) => {
   try {
     const url = `/getUserchatRoomId/${_id}`;
     const link = host + url;
