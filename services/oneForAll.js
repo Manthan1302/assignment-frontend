@@ -189,7 +189,7 @@ export const getBidsonTaskServices = async ({ _id }) => {
 
     const response = await axios.get(link);
 
-    // console.log("response: ", response.data);
+    console.log("response: ", response.data);
 
     const { allTaskBids, error } = response.data;
 
@@ -462,6 +462,28 @@ export const getMychatWithClientService = async ({ _id, headers }) => {
   }
 };
 
+
+export const postOrderServices  =async({_id,headers,data})=>
+{
+  console.log(_id);
+  try {
+    const url = `/placeOrder/${_id}`;
+    const link = host + url;
+
+    const reply = await axios.put(link,data,headers);
+    const { accepted,rejected, error } = reply.data;
+    if (error) {
+      return { error };
+    }
+
+    return { chatRoom };
+  } catch (error) {
+    console.log("error: ", error);
+
+    return { error };
+  }
+};
+
 // client chat
 export const getAllClientChatService = async ({ headers }) => {
   try {
@@ -521,13 +543,16 @@ export const postClientAttachment = async ({ fd, headers }) => {
       return { error };
     }
 
-    return { newMessage };
+
+    return { accepted,rejected };
   } catch (error) {
     console.log("error: ", error);
 
-    return { error };
+    return { error }
   }
-};
+
+}
+
 
 export const getMychatWithUserService = async ({ _id, headers }) => {
   try {
@@ -549,3 +574,4 @@ export const getMychatWithUserService = async ({ _id, headers }) => {
     return { error };
   }
 };
+

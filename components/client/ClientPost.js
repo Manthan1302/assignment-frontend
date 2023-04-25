@@ -354,53 +354,63 @@ const ClientPost = () => {
                   marginTop: 25,
                 }}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    width: 350,
-                    height: 80,
-                    backgroundColor: "white",
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                    borderRadius: 5,
-                    shadowColor: "#748c94",
-                    elevation: 10,
-
-                    // marginTop: 10,
-                    marginBottom: 17,
-                  }}
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("ClientBid", {
+                      assignment: item,
+                    })
+                  }
                 >
-                  <View style={{ width: 150 }}>
-                    <Text style={{ fontWeight: "500" }}>
-                      {item.assignmentName}
-                    </Text>
-                    <Text style={{ fontWeight: "500" }}>
-                      {item.assignmentType}
-                    </Text>
-                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      width: 350,
+                      height: 80,
+                      backgroundColor: "white",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      borderRadius: 5,
+                      shadowColor: "#748c94",
+                      elevation: 10,
 
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <CurrencyRupeeIcon
-                      color={"#E90064"}
-                      height={25}
-                      width={25}
-                    />
-                    <Text
-                      style={{
-                        fontWeight: "500",
-                      }}
+                      // marginTop: 10,
+                      marginBottom: 17,
+                    }}
+                  >
+                    <View style={{ width: 150 }}>
+                      <Text style={{ fontWeight: "500" }}>
+                        {item.assignmentName}
+                      </Text>
+                      <Text style={{ fontWeight: "500" }}>
+                        {item.assignmentType}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                      {item.assignmentBudget}
-                    </Text>
+                      <CurrencyRupeeIcon
+                        color={"#E90064"}
+                        height={25}
+                        width={25}
+                      />
+                      <Text
+                        style={{
+                          fontWeight: "500",
+                        }}
+                      >
+                        {item.assignmentBudget}
+                      </Text>
+                    </View>
+                    <PencilSquareIcon
+                      style={{ color: "black" }}
+                    ></PencilSquareIcon>
+                    <TrashIcon
+                      style={{ color: "black" }}
+                      onPress={() => deleteAssignment(item)}
+                    ></TrashIcon>
                   </View>
-                  <PencilSquareIcon
-                    style={{ color: "black" }}
-                  ></PencilSquareIcon>
-                  <TrashIcon
-                    style={{ color: "black" }}
-                    onPress={() => deleteAssignment(item)}
-                  ></TrashIcon>
-                </View>
+                </TouchableOpacity>
               </View>
             );
           })
