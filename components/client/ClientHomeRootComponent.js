@@ -11,6 +11,7 @@ import {
   BackHandler,
   TouchableOpacity,
   ToastAndroid,
+  RefreshControl,
   KeyboardAvoidingView,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -28,11 +29,12 @@ import { getAllUsersServices } from "../../services/oneForAll";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const ClientMain = () => {
   const navigation = useNavigation();
-  const dispatch = useDispatch();
   const [loader, setLoader] = useState(true);
   const [users, setUsers] = useState([]);
 
   const clientToken = useSelector((state) => state.client).token;
+
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const backAction = () => {
@@ -54,47 +56,50 @@ const ClientMain = () => {
       backAction
     );
 
-    getUser();
+    getUserWorks();
   }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerShown: false,
+      headerShown: true,
+
+      headerBackVisible: false,
+      headerTitle: "Taskify",
+      headerStyle: {
+        backgroundColor: "#E90064",
+      },
+      headerTitleStyle: {
+        color: "white",
+        fontWeight: "500",
+      },
     });
   }, []);
 
-  const getUser = async () => {
+  const getUserWorks = async () => {
     setLoader(true);
     const headers = { headers: { Authorization: `Bearer ${clientToken}` } };
     const data = await getAllUsersServices({ headers });
 
-    const { users, error } = data;
-    console.log("user:", users);
+    const { allWorkImages, error } = data;
+    console.log("user:", allWorkImages);
 
-    error && users === undefined
+    error && allWorkImages === undefined
       ? ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
       : "";
 
-    users ? setLoader(false) : setLoader(true);
-    users ? setUsers(users) : [];
-  };
+    allWorkImages.reverse();
 
-  const storeRecentSearches = async (item) => {
-    console.log("item store : ", item);
-
-    try {
-      const value = await AsyncStorage.getAllKeys();
-      console.log("value in store recent: ", value);
-
-      await AsyncStorage.setItem(item, item);
-    } catch (e) {
-      console.log("error :", e);
-    }
+    allWorkImages ? setLoader(false) : setLoader(true);
+    allWorkImages ? setUsers(allWorkImages) : [];
   };
 
   return (
-    <KeyboardAwareScrollView>
-      <SafeAreaView style={{ padding: 10 }}>
+    <KeyboardAwareScrollView
+      refreshControl={
+        <RefreshControl refreshing={refresh} onRefresh={() => getUserWorks()} />
+      }
+    >
+      <View style={{ marginTop: 10, marginBottom: 100 }}>
         {loader ? (
           <Modal
             transparent={true}
@@ -128,70 +133,92 @@ const ClientMain = () => {
           </Modal>
         ) : (
           users.map((item, index) => {
-            if (item.usertype === "user") {
-              return (
-                <View key={index}>
+            console.log("item: ", item);
+
+            return (
+              <View
+                key={index}
+                style={{ justifyContent: "space-around", alignItems: "center" }}
+              >
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "#E90064",
+                    height: 520,
+                    width: 370,
+                    marginBottom: 13,
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    borderRadius: 4,
+                    shadowColor: "black",
+                    elevation: 10,
+                  }}
+                  onPress={() => {
+                    navigation.navigate("ViewUser", {
+                      user: item.user,
+                    });
+                  }}
+                >
                   <View
                     style={{
-                      height: 440,
-                      width: 375,
-                      marginLeft: "auto",
-                      marginRight: "auto",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexDirection: "row",
+                      width: 300,
+                      padding: 10,
                     }}
                   >
-                    <View style={{ backgroundColor: "#E90064", padding: 5 }}>
-                      <TouchableOpacity
+                    <UserCircleIcon size={40} color={"white"} />
+                    <View style={{ flexDirection: "row" }}>
+                      <Text
                         style={{
-                          backgroundColor: "#E90064",
-                          justifyContent: "space-around",
-                          borderRadius: 3,
-                        }}
-                        onPress={async () => {
-                          await storeRecentSearches(item.firstName);
-
-                          navigation.navigate("ViewUser", {
-                            user: item,
-                          });
+                          fontSize: 17,
+                          color: "white",
+                          fontWeight: "500",
                         }}
                       >
-                        <Text style={{ fontSize: 20, color: "white" }}>
-                          <UserCircleIcon
-                            size={35}
-                            color={"white"}
-                            style={{ marginTop: 15 }}
-                          ></UserCircleIcon>
-                        </Text>
-                        <Text
-                          style={{
-                            marginLeft: 45,
-                            fontSize: 20,
-                            color: "white",
-                            marginTop: -30,
-                          }}
-                        >
-                          {item.firstName} {item.lastName}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View>
-                      <Image
-                        source={image}
+                        {item.user.firstName}
+                        {"   "}
+                      </Text>
+                      <Text
                         style={{
-                          height: 400,
-                          width: 370,
-                          marginLeft: "auto",
-                          marginRight: "auto",
+                          fontSize: 17,
+                          color: "white",
+                          fontWeight: "500",
                         }}
-                      />
+                      >
+                        {item.user.lastName}
+                      </Text>
                     </View>
                   </View>
-                  <Text>{"\n"}</Text>
-                </View>
-              );
-            }
+                  <Image
+                    source={{ uri: item.workImage }}
+                    style={{ height: 400, width: 350, borderRadius: 4 }}
+                  />
+                  <View
+                    style={{
+                      alignItems: "flex-start",
+                      width: 300,
+                      padding: 10,
+                    }}
+                  >
+                    <Text
+                      style={{ fontSize: 15, color: "pink", fontWeight: "600" }}
+                    >
+                      Prof . {item.user.profession}
+                    </Text>
+                    <Text
+                      style={{ fontSize: 15, color: "pink", fontWeight: "600" }}
+                    >
+                      Expn . {item.user.experience} yrs
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            );
           })
         )}
-      </SafeAreaView>
+      </View>
     </KeyboardAwareScrollView>
   );
 };

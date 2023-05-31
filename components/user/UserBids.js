@@ -224,9 +224,104 @@ const UserBids = () => {
                           <Text> {item.userMessage}</Text>
                           <Text>
                             {item.bidStatus === "pending" ? (
-                              <Text style={{ color: "red" }}>pending *</Text>
+                              <Text style={{ color: "red" }}>
+                                {item.bidStatus} *
+                              </Text>
                             ) : (
-                              <Text style={{ color: "green" }}>accepted *</Text>
+                              <Text style={{ color: "green" }}>
+                                {item.bidStatus} *
+                              </Text>
+                            )}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#E90064",
+                            width: 60,
+                            height: 40,
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            borderRadius: 3,
+                          }}
+                          onPress={() => {
+                            setModalStatus(true), setBidInfo(item);
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 16,
+                              fontWeight: "500",
+                            }}
+                          >
+                            info
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                } else {
+                  return (
+                    <View
+                      key={index}
+                      style={{
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        margin: 15,
+                      }}
+                    >
+                      <View
+                        style={{
+                          backgroundColor: "white",
+                          flexDirection: "row",
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          width: 350,
+                          borderRadius: 3,
+                          padding: 7,
+                          elevation: 15,
+                          shadowColor: "#748c94",
+                        }}
+                      >
+                        <NewspaperIcon
+                          color={"#E90064"}
+                          height={40}
+                          width={40}
+                        />
+                        <View
+                          style={{
+                            // backgroundColor: "green",
+                            width: 200,
+                            minHeight: 80,
+                            maxHeight: 200,
+                            alignItems: "flex-start",
+                            justifyContent: "space-around",
+                          }}
+                        >
+                          <View
+                            style={{
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              flexDirection: "row",
+                            }}
+                          >
+                            <CurrencyRupeeIcon
+                              color={"#E90064"}
+                              height={20}
+                              width={20}
+                            />
+                            <Text>{item.finalPrice}</Text>
+                          </View>
+                          <Text> {item.userMessage}</Text>
+                          <Text>
+                            {item.bidStatus === "accepted" ? (
+                              <Text style={{ color: "green" }}>
+                                {item.bidStatus} *
+                              </Text>
+                            ) : (
+                              <Text style={{ color: "red" }}>
+                                {item.bidStatus} *
+                              </Text>
                             )}
                           </Text>
                         </View>

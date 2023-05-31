@@ -35,6 +35,7 @@ import { useSelector } from "react-redux";
 import {
   getOrdersForUserService,
   onWorkCompleteService,
+  askForPaymentService,
 } from "../../services/oneForAll";
 
 // task screen
@@ -109,6 +110,48 @@ const UserOrders = () => {
 
     getUserOrders();
   };
+
+  const askForPayment = async (assignmentCost, clientId, _id, assignmentId) => {
+    console.log("assignmentId: ", assignmentId);
+    console.log("clientId: ", clientId);
+    console.log("_id: ", _id);
+    console.log("assignmentCost: ", assignmentCost);
+    setLoader(true);
+    const headers = { headers: { Authorization: `Bearer ${userToken}` } };
+
+    const response = await askForPaymentService({
+      assignmentCost,
+      clientId,
+      _id,
+      headers,
+      assignmentId,
+    });
+
+    const { success, error } = response;
+
+    success ? setLoader(false) : setLoader(false);
+
+    if (error) {
+      setModalStatus(false);
+      return ToastAndroid.show(
+        `${error.message}`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+
+    if (success) {
+      setModalStatus(false);
+      getUserOrders();
+      return ToastAndroid.show(
+        `${success}`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+  };
+
+  let notdone = 0;
 
   if (!userToken) {
     return (
@@ -187,7 +230,7 @@ const UserOrders = () => {
             {allOrders.length !== 0 ? (
               <View>
                 {allOrders.map((item, index) => {
-                  console.log("item: ", item);
+                  // console.log("item: ", item);
 
                   if (item.paymentStatus === "pending") {
                     return (
@@ -237,6 +280,34 @@ const UserOrders = () => {
                             view
                           </Text>
                         </TouchableOpacity>
+                      </View>
+                    );
+                  } else {
+                    notdone = notdone + 1;
+                  }
+
+                  if (allOrders.length === notdone) {
+                    console.log("notdone: ", notdone);
+                    console.log("allOrders.length: ", allOrders.length);
+
+                    return (
+                      <View
+                        style={{
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          marginTop: 40,
+                        }}
+                        key={index}
+                      >
+                        <Text
+                          style={{
+                            color: "grey",
+                            fontSize: 17,
+                            fontWeight: "500",
+                          }}
+                        >
+                          accept some more tasks!
+                        </Text>
                       </View>
                     );
                   }
@@ -524,7 +595,6 @@ const UserOrders = () => {
                           justifyContent: "space-around",
                           alignItems: "center",
                           width: 280,
-                          // backgroundColor: "pink",
                         }}
                       >
                         {orderInfo.workStatus === "pending" ? (
@@ -540,15 +610,9 @@ const UserOrders = () => {
                             }}
                             onPress={() => onWorkComplete(orderInfo._id)}
                           >
-                            {orderInfo.workStatus === "pending" ? (
-                              <Text style={{ color: "white", marginLeft: 5 }}>
-                                completed ?
-                              </Text>
-                            ) : (
-                              <Text style={{ color: "white", marginLeft: 5 }}>
-                                completed
-                              </Text>
-                            )}
+                            <Text style={{ color: "white", marginLeft: 5 }}>
+                              completed ?
+                            </Text>
                           </TouchableOpacity>
                         ) : (
                           <View
@@ -562,15 +626,51 @@ const UserOrders = () => {
                               height: 60,
                             }}
                           >
-                            {orderInfo.workStatus === "pending" ? (
-                              <Text style={{ color: "white", marginLeft: 5 }}>
-                                completed ?
-                              </Text>
-                            ) : (
-                              <Text style={{ color: "white", marginLeft: 5 }}>
-                                completed
-                              </Text>
-                            )}
+                            <Text style={{ color: "white", marginLeft: 5 }}>
+                              completed
+                            </Text>
+                          </View>
+                        )}
+
+                        {orderInfo.workStatus === "pending" ? (
+                          ""
+                        ) : orderInfo.paymentStatus === "pending" ? (
+                          <TouchableOpacity
+                            style={{
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              backgroundColor: "#E90064",
+                              padding: 8,
+                              borderRadius: 3,
+                              height: 60,
+                            }}
+                            onPress={() =>
+                              askForPayment(
+                                orderInfo.finalBid.finalPrice,
+                                orderInfo.client._id,
+                                orderInfo._id,
+                                orderInfo.assignment._id
+                              )
+                            }
+                          >
+                            <Text style={{ color: "white", marginLeft: 5 }}>
+                              Ask for payment
+                            </Text>
+                          </TouchableOpacity>
+                        ) : orderInfo.paymentStatus === "asked for payment" ? (
+                          ""
+                        ) : (
+                          <View
+                            style={{
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              backgroundColor: "#E90064",
+                              padding: 8,
+                              borderRadius: 3,
+                              height: 60,
+                            }}
+                          >
+                            payment received!
                           </View>
                         )}
                       </View>

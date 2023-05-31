@@ -151,7 +151,11 @@ const UserChat = () => {
               <View>
                 {myChats.map((item, index) => {
                   console.log("index: ", index);
-                  console.log("item: ", item);
+                  console.log("item - chat: ", item);
+
+                  const lastMsg = item.chats.length - 1;
+                  console.log("lastMsg: ", lastMsg);
+
                   return (
                     <TouchableOpacity
                       key={index}
@@ -183,7 +187,7 @@ const UserChat = () => {
                           borderRadius: 100,
                         }}
                       />
-                      <View style={{ width: 180 }}>
+                      <View style={{ width: 260 }}>
                         <Text
                           style={{
                             marginTop: 5,
@@ -207,24 +211,24 @@ const UserChat = () => {
                           style={{
                             marginTop: 5,
                             fontSize: 14,
-                            fontWeight: "400",
+                            fontWeight: "500",
+                            color: "grey",
                           }}
                         >
-                          {item.clientId.profession}
+                          {item.chats[lastMsg]?.user
+                            ? "me . " + item.chats[lastMsg].user
+                            : ""}
+                          {item.chats[lastMsg]?.client
+                            ? "client . " + item.chats[lastMsg].client
+                            : ""}
+                          {item.chats[lastMsg]?.userAttachment
+                            ? "me . Attachment was sent"
+                            : ""}
+                          {item.chats[lastMsg]?.clientAttachment
+                            ? "client . sent an Attachment"
+                            : ""}
                         </Text>
                       </View>
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: "#E90064",
-                          borderRadius: 4,
-                          height: 50,
-                          width: 65,
-                          justifyContent: "space-around",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text style={{ color: "white" }}>delete</Text>
-                      </TouchableOpacity>
                     </TouchableOpacity>
                   );
                 })}
@@ -237,6 +241,15 @@ const UserChat = () => {
                   marginTop: 40,
                 }}
               >
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  No chats started yet!
+                </Text>
                 <Text
                   style={{
                     color: "grey",

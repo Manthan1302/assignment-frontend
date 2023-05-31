@@ -464,8 +464,8 @@ const UserTaskHistory = () => {
                       <View
                         style={{
                           backgroundColor: "#E90064",
-                          height: 30,
-                          width: 80,
+                          height: 33,
+                          width: 150,
                           justifyContent: "space-around",
                           alignItems: "center",
                           marginLeft: 5,

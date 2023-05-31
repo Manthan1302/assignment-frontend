@@ -205,9 +205,13 @@ const UserNotifications = () => {
                           <Text> {item.userMessage}</Text>
                           <Text>
                             {item.bidStatus === "pending" ? (
-                              <Text style={{ color: "red" }}>pending *</Text>
+                              <Text style={{ color: "red" }}>
+                                {item.bidStatus} *
+                              </Text>
                             ) : (
-                              <Text style={{ color: "green" }}>accepted *</Text>
+                              <Text style={{ color: "green" }}>
+                                {item.bidStatus} *
+                              </Text>
                             )}
                           </Text>
                         </View>

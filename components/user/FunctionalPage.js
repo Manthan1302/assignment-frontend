@@ -13,22 +13,39 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
+  RefreshControl,
+  Modal,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { RadioButton } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   EyeIcon,
   EyeSlashIcon,
   QuestionMarkCircleIcon,
+  TrashIcon,
+  CurrencyRupeeIcon,
+  XMarkIcon,
 } from "react-native-heroicons/outline";
+import {
+  deleteComplaintUserApi,
+  getComplaintUserApi,
+  postCompaintUserApi,
+  postFeedbackUserApi,
+  getWalletService,
+  createWalletIntentService,
+  withdrawAmtService,
+} from "../../services/oneForAll";
+import { useStripe } from "@stripe/stripe-react-native";
 
 const FunctionalPage = ({ route }) => {
   const navigation = useNavigation();
   const { screenName } = route.params;
+
+  const [refresh, setRefresh] = useState(false);
 
   const backAction = () => {
     // const popAction = StackActions.pop(1);
@@ -41,6 +58,9 @@ const FunctionalPage = ({ route }) => {
     "hardwareBackPress",
     backAction
   );
+
+  const _id = useSelector((state) => state.user)._id;
+  const token = useSelector((state) => state.user).token;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -99,10 +119,938 @@ const FunctionalPage = ({ route }) => {
 
   //   customer support page
   if (screenName === "Customer Support") {
+    useEffect(() => {
+      getComplaint();
+    }, []);
+    const [feedback, setFeedback] = useState("");
+    const [complaint, setComplaint] = useState("");
+    const [allMyComplaints, setMyComplaints] = useState([]);
+    const [feedLoader, setFeedLoader] = useState(false); //button loader
+    const [complaintLoader, setComplaintLoader] = useState(false); //button loader
+
+    const [mainLoader, setMainLoader] = useState(false); // loader loader
+
+    const postFeedback = async () => {
+      if (!token) {
+        return ToastAndroid.show(
+          `Please login first!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      setFeedLoader(true);
+
+      if (feedback === "") {
+        return ToastAndroid.show(
+          `add your feedback first!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+      const reply = await postFeedbackUserApi({ feedback, headers });
+      const { feed, error } = reply;
+
+      feed ? setFeedLoader(false) : setFeedLoader(false);
+
+      if (error) {
+        return ToastAndroid.show(
+          `${error}!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      if (feed) {
+        return ToastAndroid.show(
+          `Thanks for your feedback!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+    };
+
+    const postComplaint = async () => {
+      if (!token) {
+        return ToastAndroid.show(
+          `Please login first!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+      setComplaintLoader(true);
+
+      if (complaint === "") {
+        return ToastAndroid.show(
+          `add your complaint first!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+      const reply = await postCompaintUserApi({ complaint, headers });
+      const { addComplaint, error } = reply;
+      console.log("addComplaint: ", addComplaint);
+
+      addComplaint ? setComplaintLoader(false) : setComplaintLoader(false);
+
+      if (error) {
+        setComplaint("");
+        getComplaint();
+        return ToastAndroid.show(
+          `${error}!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      if (addComplaint) {
+        setComplaint("");
+        getComplaint();
+        return ToastAndroid.show(
+          `your complaint has been added!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+    };
+
+    const getComplaint = async () => {
+      if (!token) {
+        return ToastAndroid.show(
+          `Please login first!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+      setMainLoader(true);
+
+      const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+      const reply = await getComplaintUserApi({ headers });
+      const { myComplaints, error } = reply;
+      console.log("myComplaints: ", myComplaints);
+
+      myComplaints ? setMainLoader(false) : setMainLoader(false);
+
+      myComplaints ? setMyComplaints(myComplaints) : setMyComplaints([]);
+
+      if (error) {
+        return ToastAndroid.show(
+          `${error}!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+    };
+
+    const deleteComplaint = async (id) => {
+      if (!token) {
+        return ToastAndroid.show(
+          `Please login first!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+      setMainLoader(true);
+
+      const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+      const reply = await deleteComplaintUserApi({ id, headers });
+      const { feedDeleted, error } = reply;
+
+      // feedDeleted ? setMainLoader(false) : setMainLoader(false);
+
+      if (feedDeleted) {
+        getComplaint();
+
+        return ToastAndroid.show(
+          `complaint deleted!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      if (error) {
+        return ToastAndroid.show(
+          `${error}!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+    };
+
     return (
-      <View>
-        <Text>customer support page rendered</Text>
-      </View>
+      <KeyboardAwareScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refresh}
+            onRefresh={() => getComplaint()}
+          />
+        }
+      >
+        {mainLoader ? (
+          <Modal
+            transparent={true}
+            style={{ justifyContent: "space-around", alignItems: "center" }}
+          >
+            <View
+              style={{
+                backgroundColor: "#FFFFFFaa",
+                flex: 1,
+                justifyContent: "space-around",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#E90064",
+                  height: 70,
+                  width: 70,
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  borderRadius: 5,
+                  borderColor: "white",
+                  borderWidth: 2,
+                }}
+              >
+                <ActivityIndicator size={30} color={"white"} />
+              </View>
+            </View>
+          </Modal>
+        ) : (
+          <View style={{ marginBottom: 100 }}>
+            <View
+              style={{ justifyContent: "space-around", alignItems: "center" }}
+            >
+              <View
+                style={{
+                  backgroundColor: "white",
+                  height: 250,
+                  width: 330,
+                  padding: 20,
+                  marginTop: 20,
+                  marginBottom: 20,
+                  borderRadius: 5,
+                  shadowColor: "#748c94",
+                  elevation: 20,
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontSize: 18, textAlign: "center" }}>
+                  Tell something you liked about our app {">>>"}
+                </Text>
+                <TextInput
+                  multiline={true}
+                  style={{
+                    backgroundColor: "#E90064",
+                    width: 230,
+                    height: 80,
+                    borderRadius: 5,
+                    color: "white",
+                    fontSize: 17,
+                    padding: 10,
+                    fontWeight: "600",
+                  }}
+                  onChangeText={(text) => setFeedback(text)}
+                />
+                <TouchableOpacity
+                  style={{
+                    height: 40,
+                    width: 120,
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                    borderBottomColor: "#E90064",
+                    borderBottomWidth: 2,
+                    // backgroundColor: "green",
+                  }}
+                  onPress={() => postFeedback()}
+                >
+                  {feedLoader ? (
+                    <ActivityIndicator color={"#E90064"} size={30} />
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 19,
+                        fontWeight: "500",
+                        color: "#E90064",
+                      }}
+                    >
+                      Submit!
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+            {/* complaints */}
+            <View
+              style={{ justifyContent: "space-around", alignItems: "center" }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#E90064",
+                  height: 250,
+                  width: 330,
+                  padding: 20,
+                  // marginTop: 0,
+                  marginBottom: 30,
+                  borderRadius: 5,
+                  shadowColor: "#748c94",
+                  elevation: 20,
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{ fontSize: 18, textAlign: "center", color: "white" }}
+                >
+                  Faced Some problems , Tell us below {">>>"}
+                </Text>
+                <TextInput
+                  multiline={true}
+                  style={{
+                    backgroundColor: "white",
+                    width: 230,
+                    height: 50,
+                    borderRadius: 5,
+                    color: "#E90064",
+                    fontSize: 17,
+                    padding: 10,
+                    fontWeight: "600",
+                  }}
+                  value={complaint}
+                  onChangeText={(text) => setComplaint(text)}
+                />
+                <TouchableOpacity
+                  style={{
+                    height: 40,
+                    width: 120,
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                    borderBottomColor: "white",
+                    borderBottomWidth: 2,
+                    // backgroundColor: "green",
+                  }}
+                  onPress={() => postComplaint()}
+                >
+                  {complaintLoader ? (
+                    <ActivityIndicator color={"white"} size={30} />
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 19,
+                        fontWeight: "500",
+                        color: "white",
+                      }}
+                    >
+                      List Down!
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {allMyComplaints.length !== 0
+              ? allMyComplaints.map((item, index) => {
+                  if (item.complaintStatus === "false") {
+                    return (
+                      <View
+                        style={{
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          marginBottom: 20,
+                        }}
+                        key={index}
+                      >
+                        <View
+                          style={{
+                            backgroundColor: "white",
+                            width: 360,
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            flexDirection: "row",
+                            padding: 10,
+                            borderRadius: 5,
+                            shadowColor: "#748c94",
+                            elevation: 20,
+                          }}
+                        >
+                          <View
+                            style={{
+                              width: 270,
+                              padding: 10,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: "grey",
+                                fontSize: 15,
+                                fontWeight: "500",
+                                margin: 5,
+                              }}
+                            >
+                              {item._id}
+                            </Text>
+                            <Text>{item.complaint}</Text>
+                            {item.admin ? <Text>{item.admin}</Text> : ""}
+                            {item.complaintStatus === "false" ? (
+                              <Text style={{ color: "red" }}>pending*</Text>
+                            ) : (
+                              <Text style={{ color: "green" }}>solved*</Text>
+                            )}
+                          </View>
+
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: "#E90064",
+                              padding: 10,
+                              borderRadius: 3,
+                            }}
+                            onPress={() => deleteComplaint(item._id)}
+                          >
+                            <TrashIcon color={"white"} size={30} />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    );
+                  }
+                })
+              : ""}
+          </View>
+        )}
+      </KeyboardAwareScrollView>
+    );
+  }
+
+  //   customer support page
+  if (screenName === "Wallet") {
+    const navigation = useNavigation();
+
+    const [refresh, setRefresh] = useState(false); // pull-down-refresh
+    const [loader, setLoader] = useState(false); // loader state
+
+    const [balance, setMyBalance] = useState([]); //
+    const [amount, setAmount] = useState("");
+
+    const [modalState, setModalState] = useState(false); // modal state
+
+    const [doneLoader, setDoneLoader] = useState(false);
+
+    useEffect(() => {
+      getMyWalletBalance();
+    }, []);
+
+    const firstName = useSelector((state) => state.user).firstName;
+    const lastName = useSelector((state) => state.user).lastName;
+
+    const getMyWalletBalance = async () => {
+      setLoader(true);
+      const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+      const response = await getWalletService({ headers });
+
+      const { error, myBalance } = response;
+
+      myBalance ? setLoader(false) : setLoader(false);
+
+      if (error) {
+        return ToastAndroid.show(
+          `Wallet is empty!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      setMyBalance(myBalance);
+      console.log("myBalance: ", myBalance);
+    };
+
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+    const withdrawAmount = async () => {
+      if (amount === "") {
+        return ToastAndroid.show(
+          `withdrawl amount not added!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      console.log("amount: ", amount);
+
+      if (amount > balance.TotalBalance || amount > balance.length) {
+        return ToastAndroid.show(
+          `Insufficient balance!`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
+
+      const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+      setLoader(true);
+
+      // create payment intent ->
+      const intentId = await createWalletIntentService({
+        amount: Number(amount),
+        headers,
+      });
+
+      const { paymentIntent, error } = intentId;
+      console.log("paymentIntent: ", paymentIntent);
+
+      if (error) {
+        console.log("error: ", error);
+        setLoader(false);
+        return;
+      }
+
+      paymentIntent ? setLoader(false) : setLoader(false);
+      // initialize pament sheet
+      const initPayment = await initPaymentSheet({
+        merchantDisplayName: `${firstName}`,
+        paymentIntentClientSecret: paymentIntent, //payment intent
+        style: "alwaysDark",
+      });
+
+      console.log("initPayment: ", initPayment);
+
+      if (initPayment.error) {
+        console.log("initPayment.error: ", initPayment.error);
+        setLoader(false);
+        return;
+      }
+
+      // present the payment sheet
+      const paymentResponse = await presentPaymentSheet();
+
+      if (paymentResponse.error) {
+        console.log("paymentResponse.error: ", paymentResponse.error);
+        return;
+      }
+
+      //call other payemnt gateway mechanism
+
+      if (paymentResponse) {
+        const response = await withdrawAmtService({ headers, amount });
+
+        const { error, success } = response;
+
+        if (error) {
+          return ToastAndroid.show(
+            `${error.message}`,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        }
+
+        ToastAndroid.show(
+          `${success}`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+
+        getMyWalletBalance();
+        setModalState(false);
+      }
+    };
+
+    return (
+      <KeyboardAwareScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refresh}
+            onRefresh={() => getMyWalletBalance()}
+          />
+        }
+      >
+        {loader ? (
+          <Modal
+            transparent={true}
+            style={{ justifyContent: "space-around", alignItems: "center" }}
+          >
+            <View
+              style={{
+                backgroundColor: "#FFFFFFaa",
+                flex: 1,
+                justifyContent: "space-around",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#E90064",
+                  height: 70,
+                  width: 70,
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  borderRadius: 5,
+                  borderColor: "white",
+                  borderWidth: 2,
+                }}
+              >
+                <ActivityIndicator size={30} color={"white"} />
+              </View>
+            </View>
+          </Modal>
+        ) : (
+          <View
+            style={{
+              justifyContent: "space-around",
+              alignItems: "center",
+              marginTop: 15,
+            }}
+          >
+            {/* rectangle box */}
+            <View
+              style={{
+                backgroundColor: "#E90064",
+                borderColor: "white",
+                borderWidth: 3,
+                borderStyle: "dashed",
+                height: 90,
+                width: 130,
+                top: 85,
+                left: 120,
+                zIndex: 1,
+                borderRadius: 5,
+              }}
+            >
+              {/* circle */}
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "white",
+                  height: 50,
+                  width: 90,
+                  borderRadius: 100,
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  top: 15,
+                  left: 10,
+                }}
+                onPress={() => setModalState(true)}
+              >
+                <Text style={{ fontWeight: "700" }}>withdraw</Text>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                backgroundColor: "#E90064",
+                height: 250,
+                width: 350,
+                justifyContent: "space-around",
+                alignItems: "center",
+                marginTop: -80,
+                borderRadius: 5,
+              }}
+            >
+              <View
+                style={{
+                  //   backgroundColor: "white",
+                  height: 230,
+                  width: 330,
+                  borderColor: "white",
+                  borderWidth: 3,
+                  borderStyle: "dashed",
+                }}
+              >
+                <Text
+                  style={{
+                    padding: 15,
+                    fontSize: 20,
+                    color: "white",
+                    fontWeight: "600",
+                  }}
+                >
+                  {firstName + lastName}
+                </Text>
+                <Text
+                  style={{
+                    padding: 15,
+                    fontSize: 20,
+                    color: "white",
+                    fontWeight: "600",
+                  }}
+                >
+                  Total balance:
+                </Text>
+                <Text
+                  style={{
+                    padding: 15,
+                    top: -20,
+                    fontSize: 50,
+                    color: "white",
+                    fontWeight: "600",
+                    // backgroundColor: "green",
+                    width: 250,
+                  }}
+                >
+                  {balance.length !== 0 ? balance.TotalBalance : balance.length}
+                </Text>
+              </View>
+            </View>
+
+            {/* transactions */}
+            <View>
+              {balance.length !== 0 ? (
+                balance?.transaction.map((item, index) => {
+                  console.log("item: ", item);
+
+                  const date = new Date(item.date);
+
+                  const dd = date.getDate();
+                  const mm = date.getMonth();
+                  const yy = date.getFullYear();
+
+                  if (item.type === "deposit") {
+                    return (
+                      <View
+                        key={index}
+                        style={{
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          backgroundColor: "green",
+                          marginTop: 10,
+                          width: 330,
+                          height: 70,
+                          borderRadius: 5,
+                        }}
+                      >
+                        <View>
+                          <Text
+                            style={{
+                              fontSize: 17,
+                              fontWeight: "400",
+                              color: "white",
+                            }}
+                          >
+                            {item.type}
+                          </Text>
+                          <Text style={{ color: "white" }}>
+                            {dd + "-" + mm + "-" + yy}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                          }}
+                        >
+                          <CurrencyRupeeIcon size={25} color={"white"} />
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              fontWeight: "500",
+                              color: "white",
+                            }}
+                          >
+                            {item.amount}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  } else {
+                    return (
+                      <View
+                        key={index}
+                        style={{
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          backgroundColor: "red",
+                          marginTop: 10,
+                          width: 330,
+                          height: 70,
+                          borderRadius: 5,
+                        }}
+                      >
+                        <View>
+                          <Text
+                            style={{
+                              fontSize: 17,
+                              fontWeight: "400",
+                              color: "white",
+                            }}
+                          >
+                            {item.type}
+                          </Text>
+                          <Text style={{ color: "white" }}>
+                            {dd + "-" + mm + "-" + yy}
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                          }}
+                        >
+                          <CurrencyRupeeIcon size={25} color={"white"} />
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              fontWeight: "500",
+                              color: "white",
+                            }}
+                          >
+                            {item.amount}
+                          </Text>
+                        </View>
+                      </View>
+                    );
+                  }
+                })
+              ) : (
+                <View
+                  style={{
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                    marginTop: 40,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "grey",
+                      fontSize: 17,
+                      fontWeight: "500",
+                    }}
+                  >
+                    wallet is empty!
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* withdrawl model */}
+        {modalState ? (
+          <Modal
+            transparent={true}
+            style={{ justifyContent: "space-around", alignItems: "center" }}
+          >
+            <View
+              style={{
+                backgroundColor: "#FFFFFFaa",
+                flex: 1,
+                justifyContent: "space-around",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#E90064",
+                  height: 270,
+                  width: 300,
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  // flexDirection: "row",
+                  borderRadius: 5,
+                  borderColor: "white",
+                  borderWidth: 2,
+                }}
+              >
+                <View
+                  style={{
+                    width: 270,
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{ backgroundColor: "white", borderRadius: 3 }}
+                    onPress={() => {
+                      setModalState(false), setAmount("");
+                    }}
+                  >
+                    <XMarkIcon color={"#E90064"} size={40} />
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    height: 180,
+                    width: 270,
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "400",
+                      color: "white",
+                    }}
+                  >
+                    Withdrawl Amount
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      width: 280,
+                    }}
+                  >
+                    <TextInput
+                      style={{
+                        backgroundColor: "#E90064",
+                        padding: 10,
+                        height: 60,
+                        width: 200,
+                        fontSize: 18,
+                        borderRadius: 3,
+                        borderColor: "white",
+                        borderWidth: 2,
+                        color: "white",
+                      }}
+                      keyboardType="numeric"
+                      onChangeText={(text) => setAmount(text)}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    style={{
+                      marginTop: 20,
+                      backgroundColor: "white",
+                      width: 90,
+                      height: 40,
+                      borderRadius: 3,
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      borderColor: "#E90064",
+                      borderWidth: 2,
+                    }}
+                    onPress={() => withdrawAmount()}
+                  >
+                    {doneLoader ? (
+                      <ActivityIndicator color={"#E90064"} size={30} />
+                    ) : (
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          fontWeight: "300",
+                        }}
+                      >
+                        withdraw
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        ) : (
+          ""
+        )}
+      </KeyboardAwareScrollView>
     );
   }
 

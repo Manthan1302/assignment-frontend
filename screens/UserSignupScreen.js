@@ -139,7 +139,7 @@ const UserSignupScreen = () => {
       if (response) {
         setLoader(false);
         ToastAndroid.show(
-          `Sign in Successfull!`,
+          `Sign up Successfull!`,
           ToastAndroid.SHORT,
           ToastAndroid.BOTTOM
         );

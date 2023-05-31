@@ -33,6 +33,7 @@ const UserChat = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: `Chat with User`,
+      headerShown: true,
       headerStyle: {
         backgroundColor: "#E90064",
       },
@@ -105,7 +106,7 @@ const UserChat = () => {
         />
       }
     >
-      <SafeAreaView>
+      <SafeAreaView style={{ marginTop: -15 }}>
         {loader ? (
           <Modal
             transparent={true}
@@ -147,10 +148,14 @@ const UserChat = () => {
             <ScrollView>
               {console.log("myChats: ", myChats)}
               {myChats.length !== 0 ? (
-                <View>
+                <View style={{ marginBottom: 50 }}>
                   {myChats.map((item, index) => {
                     console.log("index: ", index);
                     console.log("item: ", item);
+
+                    const lastMsg = item.chats.length - 1;
+                    console.log("lastMsg: ", lastMsg);
+
                     return (
                       <TouchableOpacity
                         key={index}
@@ -182,7 +187,7 @@ const UserChat = () => {
                             borderRadius: 100,
                           }}
                         />
-                        <View style={{ width: 180 }}>
+                        <View style={{ width: 260 }}>
                           <Text
                             style={{
                               marginTop: 5,
@@ -195,35 +200,36 @@ const UserChat = () => {
                           </Text>
                           <Text
                             style={{
-                              marginTop: 5,
+                              marginTop: 3,
                               fontSize: 14,
                               fontWeight: "400",
+                              textTransform: "capitalize",
                             }}
                           >
-                            {item.userId.email}
+                            {item.userId.profession}
                           </Text>
                           <Text
                             style={{
                               marginTop: 5,
                               fontSize: 14,
-                              fontWeight: "400",
+                              fontWeight: "500",
+                              color: "grey",
                             }}
                           >
-                            {item.userId.profession}
+                            {item.chats[lastMsg]?.user
+                              ? "user . " + item.chats[lastMsg].user
+                              : ""}
+                            {item.chats[lastMsg]?.client
+                              ? "me . " + item.chats[lastMsg].client
+                              : ""}
+                            {item.chats[lastMsg]?.userAttachment
+                              ? "user . sent an Attachment"
+                              : ""}
+                            {item.chats[lastMsg]?.clientAttachment
+                              ? "me . Attachment was sent"
+                              : ""}
                           </Text>
                         </View>
-                        <TouchableOpacity
-                          style={{
-                            backgroundColor: "#E90064",
-                            borderRadius: 4,
-                            height: 50,
-                            width: 65,
-                            justifyContent: "space-around",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Text style={{ color: "white" }}>delete</Text>
-                        </TouchableOpacity>
                       </TouchableOpacity>
                     );
                   })}
@@ -243,7 +249,7 @@ const UserChat = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Please make a bid to start the chat!
+                    You have not started chat with anyone!
                   </Text>
                 </View>
               )}

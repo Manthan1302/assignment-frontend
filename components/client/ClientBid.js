@@ -25,8 +25,10 @@ import {
   CurrencyRupeeIcon,
   EyeIcon,
   EyeSlashIcon,
+  InformationCircleIcon,
   NewspaperIcon,
   TrashIcon,
+  UserIcon,
   XMarkIcon,
 } from "react-native-heroicons/outline";
 import {
@@ -113,19 +115,46 @@ const ClientBid = ({ route }) => {
       const onClickOk = async () => {
         const headers = { headers: { Authorization: `Bearer ${clientToken}` } };
         // console.log("🚀 ~ file: ClientBid.js:109 ~ acceptBid ~ _id:", _id)
-        const bidStatus = "accepted";
-        const data = { bidStatus };
-        const result = await postOrderServices({ _id, headers, data });
 
-        const { accepted, rejected, error } = result;
+        myBids.map(async (item) => {
+          // console.log("item: ", item._id);
 
-        if (error) {
-          ToastAndroid.show(
-            `${error}`,
-            ToastAndroid.SHORT,
-            ToastAndroid.BOTTOM
-          );
-        }
+          if (_id === item._id) {
+            console.log("accepted bid id :", _id);
+            const bidStatus = "accepted";
+            const data = { bidStatus };
+
+            const result = await postOrderServices({ _id, headers, data });
+
+            const { accepted, error } = result;
+            console.log("accepted: ", accepted);
+
+            if (error) {
+              return ToastAndroid.show(
+                `${error}`,
+                ToastAndroid.SHORT,
+                ToastAndroid.BOTTOM
+              );
+            }
+
+            if (acceptBid) {
+              ToastAndroid.show(
+                `Bid accepted`,
+                ToastAndroid.SHORT,
+                ToastAndroid.BOTTOM
+              );
+              getParticularTaskBid();
+              return ToastAndroid.show(
+                `Order was placed!`,
+                ToastAndroid.SHORT,
+                ToastAndroid.BOTTOM
+              );
+            }
+          } else {
+            console.log("rejected bid id :", item._id);
+            rejectAllBid(item._id);
+          }
+        });
       };
 
       Alert.alert("Accept Bid", "Are you sure , you want to Accept Bid ?", [
@@ -144,7 +173,19 @@ const ClientBid = ({ route }) => {
     }
   };
 
+  const rejectAllBid = async (_id) => {
+    const headers = { headers: { Authorization: `Bearer ${clientToken}` } };
+    const bidStatus = "rejected";
+    const data = { bidStatus };
+    const result = await postOrderServices({ _id, headers, data });
+    const { accepted, rejected, error } = result;
+    if (error) {
+      ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+    }
+  };
+
   const rejectBid = (_id) => {
+    console.log("_id: ", _id);
     try {
       const onClickOk = async () => {
         console.log(_id);
@@ -152,18 +193,25 @@ const ClientBid = ({ route }) => {
         const bidStatus = "rejected";
         const data = { bidStatus };
         const result = await postOrderServices({ _id, headers, data });
-
-        const { accepted, rejected, error } = result;
-
+        const { rejected, error } = result;
+        console.log("rejected: ", rejected);
         if (error) {
-          ToastAndroid.show(
+          return ToastAndroid.show(
             `${error}`,
             ToastAndroid.SHORT,
             ToastAndroid.BOTTOM
           );
         }
-      };
 
+        if (rejected) {
+          getBidsonTaskServices();
+          return ToastAndroid.show(
+            `You rejected a Bid!`,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM
+          );
+        }
+      };
       Alert.alert("Reject Bid", "Are you sure , you want to Reject Bid ?", [
         {
           text: "Cancel",
@@ -225,10 +273,54 @@ const ClientBid = ({ route }) => {
             marginBottom: 20,
           }}
         >
+          <View
+            style={{ justifyContent: "space-around", alignItems: "center" }}
+          >
+            <View
+              style={{
+                padding: 15,
+                minHeight: 150,
+                maxHeight: "auto",
+                borderRadius: 5,
+                width: 350,
+                backgroundColor: "#E90064",
+                marginTop: 10,
+                elevation: 15,
+                shadowColor: "#748c94",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 23,
+                  fontWeight: "300",
+                  padding: 10,
+                  color: "white",
+                }}
+              >
+                Task
+              </Text>
+              <Text style={{ fontSize: 16, fontWeight: "500", color: "white" }}>
+                Name . {assignment.assignmentName}
+              </Text>
+              <Text style={{ fontSize: 16, fontWeight: "500", color: "white" }}>
+                Description . {assignment.description}
+              </Text>
+              <Text style={{ fontSize: 16, fontWeight: "500", color: "white" }}>
+                My budget . {assignment.assignmentBudget}
+              </Text>
+              <Text style={{ fontSize: 16, fontWeight: "500", color: "white" }}>
+                Type req . {assignment.assignmentType}
+              </Text>
+              <Text style={{ fontSize: 16, fontWeight: "500", color: "white" }}>
+                Status . {assignment.assignmentStatus}
+              </Text>
+            </View>
+          </View>
+
           {myBids.length !== 0 ? (
             myBids.map((item, index) => {
               console.log("---------------------------------------------");
-              console.log("item: ", item);
+              // console.log("item: ", item);
 
               return (
                 <View
@@ -246,47 +338,131 @@ const ClientBid = ({ route }) => {
                         flexDirection: "row",
                         justifyContent: "space-around",
                         alignItems: "center",
-                        width: 350,
+                        width: 370,
                         borderRadius: 3,
                         padding: 7,
                         elevation: 15,
                         shadowColor: "#748c94",
                       }}
                     >
-                      <NewspaperIcon color={"#E90064"} height={40} width={40} />
+                      <TouchableOpacity
+                        style={{
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          flexDirection: "column",
+                          backgroundColor: "#E90064",
+                          padding: 5,
+                          borderRadius: 4,
+                        }}
+                        onPress={() => {
+                          navigation.navigate("ViewUser", {
+                            user: item.user,
+                          });
+                        }}
+                      >
+                        <UserIcon color={"white"} size={27} />
+                        <Text
+                          style={{
+                            // backgroundColor: "pink",
+                            width: 87,
+                            textAlign: "center",
+                            marginBottom: 8,
+                            color: "white",
+                            borderBottomColor: "white",
+                            borderBottomWidth: 1,
+                            marginTop: 2,
+                          }}
+                        >
+                          {item.user.firstName} {item.user.lastName}
+                        </Text>
+                        <Text
+                          style={{
+                            // backgroundColor: "pink",
+                            width: 87,
+                            textAlign: "center",
+                            marginBottom: 5,
+                            color: "white",
+                            borderBottomColor: "white",
+                            borderBottomWidth: 1,
+                          }}
+                        >
+                          {item.user.profession}
+                        </Text>
+                        <Text
+                          style={{
+                            color: "white",
+                            width: 87,
+                            textAlign: "center",
+                          }}
+                        >
+                          exp . {item.user.experience} . yr
+                        </Text>
+                      </TouchableOpacity>
+
                       <View
                         style={{
                           // backgroundColor: "green",
-                          width: 200,
+                          width: 250,
                           minHeight: 80,
                           maxHeight: 200,
-                          alignItems: "flex-start",
+                          alignItems: "center",
                           justifyContent: "space-around",
+                          flexDirection: "row",
                         }}
                       >
                         <View
                           style={{
                             justifyContent: "space-around",
-                            alignItems: "center",
-                            flexDirection: "row",
+                            alignItems: "flex-start",
+                            // backgroundColor: "orange",
                           }}
                         >
-                          <CurrencyRupeeIcon
-                            color={"#E90064"}
-                            height={20}
-                            width={20}
-                          />
-                          <Text>{item.finalPrice}</Text>
+                          <View
+                            style={{
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              flexDirection: "row",
+                            }}
+                          >
+                            <CurrencyRupeeIcon
+                              color={"#E90064"}
+                              height={20}
+                              width={20}
+                            />
+                            <Text>{item.finalPrice}</Text>
+                          </View>
+
+                          <Text
+                            style={{
+                              width: 170,
+                              marginTop: 10,
+                              marginBottom: 10,
+                              // backgroundColor: "pink",
+                            }}
+                          >
+                            {" "}
+                            {item.userMessage}
+                          </Text>
+                          <Text>
+                            {item.bidStatus === "pending" ? (
+                              <Text style={{ color: "red" }}>
+                                {item.bidStatus} *
+                              </Text>
+                            ) : (
+                              <Text style={{ color: "green" }}>
+                                {item.bidStatus} *
+                              </Text>
+                            )}
+                          </Text>
                         </View>
-                        <Text> {item.userMessage}</Text>
-                        <Text>
-                          {item.bidStatus === "pending" ? (
-                            <Text style={{ color: "red" }}>pending *</Text>
-                          ) : (
-                            <Text style={{ color: "green" }}>accepted *</Text>
-                          )}
-                        </Text>
-                        <View style={{ marginTop: 15, marginLeft: 35 }}>
+                        <View
+                          style={{
+                            flexDirection: "column",
+                            // backgroundColor: "yellow",
+                            height: 95,
+                            justifyContent: "space-around",
+                          }}
+                        >
                           <TouchableOpacity
                             style={{
                               backgroundColor: "#E90064",
@@ -318,8 +494,6 @@ const ClientBid = ({ route }) => {
                               alignItems: "center",
                               borderRadius: 3,
                               color: "white",
-                              marginLeft: 70,
-                              marginTop: -40,
                             }}
                             onPress={() => rejectBid(item._id)}
                           >
@@ -333,31 +507,9 @@ const ClientBid = ({ route }) => {
                               Reject
                             </Text>
                           </TouchableOpacity>
+                          {/*  */}
                         </View>
                       </View>
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: "#E90064",
-                          width: 60,
-                          height: 40,
-                          justifyContent: "space-around",
-                          alignItems: "center",
-                          borderRadius: 3,
-                        }}
-                        onPress={() => {
-                          setModalStatus(true), setBidInfo(item);
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: "white",
-                            fontSize: 16,
-                            fontWeight: "500",
-                          }}
-                        >
-                          info
-                        </Text>
-                      </TouchableOpacity>
                     </View>
                   ) : (
                     <View
@@ -366,108 +518,124 @@ const ClientBid = ({ route }) => {
                         flexDirection: "row",
                         justifyContent: "space-around",
                         alignItems: "center",
-                        width: 350,
+                        width: 370,
                         borderRadius: 3,
                         padding: 7,
                         elevation: 15,
                         shadowColor: "#748c94",
                       }}
                     >
-                      <NewspaperIcon color={"#E90064"} height={40} width={40} />
+                      <TouchableOpacity
+                        style={{
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          flexDirection: "column",
+                          backgroundColor: "#E90064",
+                          padding: 5,
+                          borderRadius: 4,
+                        }}
+                        onPress={() => {
+                          navigation.navigate("ViewUser", {
+                            user: item.user,
+                          });
+                        }}
+                      >
+                        <UserIcon color={"white"} size={27} />
+                        <Text
+                          style={{
+                            // backgroundColor: "pink",
+                            width: 87,
+                            textAlign: "center",
+                            marginBottom: 8,
+                            color: "white",
+                            borderBottomColor: "white",
+                            borderBottomWidth: 1,
+                            marginTop: 2,
+                          }}
+                        >
+                          {item.user.firstName} {item.user.lastName}
+                        </Text>
+                        <Text
+                          style={{
+                            // backgroundColor: "pink",
+                            width: 87,
+                            textAlign: "center",
+                            marginBottom: 5,
+                            color: "white",
+                            borderBottomColor: "white",
+                            borderBottomWidth: 1,
+                          }}
+                        >
+                          {item.user.profession}
+                        </Text>
+                        <Text
+                          style={{
+                            color: "white",
+                            width: 87,
+                            textAlign: "center",
+                          }}
+                        >
+                          exp . {item.user.experience} . yr
+                        </Text>
+                      </TouchableOpacity>
+
                       <View
                         style={{
                           // backgroundColor: "green",
-                          width: 200,
+                          width: 250,
                           minHeight: 80,
                           maxHeight: 200,
-                          alignItems: "flex-start",
+                          alignItems: "center",
                           justifyContent: "space-around",
+                          flexDirection: "row",
                         }}
                       >
                         <View
                           style={{
                             justifyContent: "space-around",
-                            alignItems: "center",
-                            flexDirection: "row",
+                            alignItems: "flex-start",
+                            // backgroundColor: "orange",
+                            width: 230,
                           }}
                         >
-                          <CurrencyRupeeIcon
-                            color={"#E90064"}
-                            height={20}
-                            width={20}
-                          />
-                          <Text>{item.finalPrice}</Text>
+                          <View
+                            style={{
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                              flexDirection: "row",
+                            }}
+                          >
+                            <CurrencyRupeeIcon
+                              color={"#E90064"}
+                              height={20}
+                              width={20}
+                            />
+                            <Text>{item.finalPrice}</Text>
+                          </View>
+
+                          <Text
+                            style={{
+                              width: 230,
+                              marginTop: 10,
+                              marginBottom: 10,
+                              // backgroundColor: "pink",
+                            }}
+                          >
+                            {item.userMessage}
+                          </Text>
+                          <Text>
+                            {item.bidStatus === "accepted" ? (
+                              <Text style={{ color: "green" }}>
+                                {item.bidStatus} *
+                              </Text>
+                            ) : (
+                              <Text style={{ color: "red" }}>
+                                {item.bidStatus} *
+                              </Text>
+                            )}
+                          </Text>
                         </View>
-                        <Text> {item.userMessage}</Text>
-                        <Text>
-                          {item.bidStatus === "pending" ? (
-                            <Text style={{ color: "red" }}>pending *</Text>
-                          ) : (
-                            <Text style={{ color: "green" }}>accepted *</Text>
-                          )}
-                        </Text>
-                        {/* <View style={{marginTop:15,marginLeft:35}}>
-  
-                   <TouchableOpacity
-                    style={{
-                      backgroundColor: "#E90064",
-                      width: 60,
-                      height: 40,
-                      justifyContent: "space-around",
-                      alignItems: "center",
-                      borderRadius: 3,
-                      color:"white",
-                    }}
-                    onPress={()=>acceptBid(item._id)}
-                  >
-                    <Text  style={{
-                        color: "white",
-                        fontSize: 16,
-                        fontWeight: "500",
-                      }}>Accept</Text></TouchableOpacity>
-                    <TouchableOpacity
-                    style={{
-                      backgroundColor: "#E90064",
-                      width: 60,
-                      height: 40,
-                      justifyContent: "space-around",
-                      alignItems: "center",
-                      borderRadius: 3,
-                      color:"white",
-                      marginLeft:70,
-                      marginTop:-40
-                    }}
-                    onPress={()=>rejectBid(item._id)}
-                  ><Text  style={{
-                    color: "white",
-                    fontSize: 16,
-                    fontWeight: "500",
-                  }}>Reject</Text></TouchableOpacity>
-                    </View> */}
                       </View>
-                      <TouchableOpacity
-                        style={{
-                          backgroundColor: "#E90064",
-                          width: 60,
-                          height: 40,
-                          justifyContent: "space-around",
-                          alignItems: "center",
-                          borderRadius: 3,
-                        }}
-                        onPress={() => {
-                          setModalStatus(true), setBidInfo(item);
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: "white",
-                            fontSize: 16,
-                            fontWeight: "500",
-                          }}
-                        >
-                          info
-                        </Text>
-                      </TouchableOpacity>
                     </View>
                   )}
                 </View>

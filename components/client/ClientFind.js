@@ -24,7 +24,7 @@ import {
   XMarkIcon,
 } from "react-native-heroicons/outline";
 import { ArrowTrendingUpIcon } from "react-native-heroicons/solid";
-import {getSearchUserServices} from "../../services/oneForAll"
+import { getSearchUserServices } from "../../services/oneForAll";
 const ClientFind = () => {
   const [searchUser, setSearch] = useState("");
   const [searchedUser, setSearchedUser] = useState([]);
@@ -68,7 +68,6 @@ const ClientFind = () => {
     });
   };
 
-
   const getRecentSearches = async () => {
     try {
       const value = await AsyncStorage.getAllKeys();
@@ -102,8 +101,8 @@ const ClientFind = () => {
   return (
     <KeyboardAwareScrollView>
       <SafeAreaView>
-      <View
-          style={{ 
+        <View
+          style={{
             flexDirection: "row",
             justifyContent: "space-around",
             alignItems: "center",
@@ -151,7 +150,6 @@ const ClientFind = () => {
         </View>
         {searchUser === "" ? (
           <>
-           
             <View style={{ alignItems: "center" }}>
               <TouchableOpacity
                 style={{
@@ -278,52 +276,79 @@ const ClientFind = () => {
                   <View
                     key={index}
                     style={{
-                      height: 440,
-                      width: 375,
-                      marginLeft: "auto",
-                      marginRight: "auto",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      margin: 10,
                     }}
                   >
                     <TouchableOpacity
-                        style={{
-                          backgroundColor: "#E90064",
-                          justifyContent: "space-around",
-                          borderRadius: 3,
-                        }}
-                        onPress={async () => {
-                          await storeRecentSearches(item.firstName);
+                      style={{
+                        backgroundColor: "#E90064",
+                        justifyContent: "space-around",
+                        borderRadius: 3,
+                      }}
+                      onPress={async () => {
+                        await storeRecentSearches(item.profession);
 
-                          navigation.navigate("ViewUser", {
-                            user: item,
-                          });
+                        navigation.navigate("ViewUser", {
+                          user: item,
+                        });
+                      }}
+                    >
+                      <View
+                        style={{
+                          height: 90,
+                          width: 350,
+                          justifyContent: "space-around",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          padding: 10,
                         }}
                       >
-                    <View style={{backgroundColor:"#E90064",padding:5}}>
-            
-            <Text style={{fontSize:20,color:"white" }}>
-            <UserCircleIcon size={35} color={"white"} style={{marginTop:15}} ></UserCircleIcon>
-            </Text>
-            <Text style={{marginLeft:45,fontSize:20,color:"white",marginTop:-30 }}>{item.firstName} {item.lastName}</Text>
-    
-            </View>
-            </TouchableOpacity>
-            
-            <View>
-                <Image source={image} style={{
-                  height: 400,
-                  width: 370,
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  
-                }}></Image>
-            </View>
+                        <UserCircleIcon size={40} color={"white"} />
+                        <View
+                          style={{
+                            padding: 10,
+                            width: 230,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              color: "white",
+                              fontWeight: "500",
+                              textTransform: "capitalize",
+                            }}
+                          >
+                            {item.firstName} {item.lastName}
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              color: "white",
+                              fontWeight: "500",
+                              textTransform: "capitalize",
+                            }}
+                          >
+                            {item.profession}
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              color: "white",
+                              fontWeight: "500",
+                            }}
+                          >
+                            {item.experience} . yrs of experience
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
                   </View>
                 );
               }
             })}
-              
           </View>
-
         )}
       </SafeAreaView>
     </KeyboardAwareScrollView>

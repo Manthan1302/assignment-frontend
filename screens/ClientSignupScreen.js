@@ -107,7 +107,7 @@ const ClientSignupScreen = () => {
       if (response) {
         setLoader(false);
         ToastAndroid.show(
-          `Sign in Successfull!`,
+          `Sign up Successfull!`,
           ToastAndroid.SHORT,
           ToastAndroid.BOTTOM
         );
@@ -115,7 +115,7 @@ const ClientSignupScreen = () => {
         const { token, client } = response;
 
         dispatch(clientData({ client, token }));
-        navigation.navigate("ClientMain");
+        navigation.navigate("ClientNav");
 
         setRegistration({
           firstName: "",

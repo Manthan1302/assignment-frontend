@@ -130,51 +130,61 @@ const ViewAssignment = ({ route }) => {
   };
 
   const postBidonTask = async () => {
-    if (userToken !== "") {
-      if (userBid.finalPrice === "" && userBid.userMessage === "") {
-        return ToastAndroid.show(
-          "please fill all the details !",
+    if (userToken === "") {
+      return ToastAndroid.show(
+        "please login first!",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+
+    if (userBid.finalPrice === "" && userBid.userMessage === "") {
+      return ToastAndroid.show(
+        "please fill all the details !",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+
+    setBidModel(true);
+    setBidLoader(true);
+    // , await getBidsonTask();
+    // setBidModel(false);
+
+    console.log("user bid :", userBid);
+
+    try {
+      const taskId = assignment._id;
+
+      const headers = { headers: { Authorization: `Bearer ${userToken}` } };
+
+      const result = await postBidonTaskService({ taskId, userBid, headers });
+
+      const { myBid, error } = result;
+
+      if (myBid) {
+        setBidLoader(false);
+        setBidModel(false);
+        ToastAndroid.show(
+          `Bid was placed!`,
           ToastAndroid.SHORT,
           ToastAndroid.BOTTOM
         );
       }
 
-      setBidModel(true);
-      setBidLoader(true);
-      // , await getBidsonTask();
-      // setBidModel(false);
-
-      console.log("user bid :", userBid);
-
-      try {
-        const taskId = assignment._id;
-
-        const headers = { headers: { Authorization: `Bearer ${userToken}` } };
-
-        const result = await postBidonTaskService({ taskId, userBid, headers });
-
-        const { myBid, error } = result;
-
-        if (myBid) {
-          setBidLoader(false);
-          setBidModel(false);
-        }
-
-        if (error) {
-          setBidLoader(false);
-          setBidModel(false);
-        }
-
-        getBidsonTask();
-      } catch (error) {
-        console.log("error: ", error);
+      if (error) {
+        setBidLoader(false);
+        setBidModel(false);
+        return ToastAndroid.show(
+          `${error}`,
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
       }
-    } else {
-      ToastAndroid.show(
-        "please login first!",
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM
-      );
+
+      getBidsonTask();
+    } catch (error) {
+      console.log("error: ", error);
     }
   };
 

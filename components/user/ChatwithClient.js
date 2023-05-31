@@ -33,7 +33,7 @@ import {
   postMessageUser,
   postUserAttachment,
 } from "../../services/oneForAll";
-import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
 
 const ChatwithClient = ({ route }) => {
   useEffect(() => {
@@ -54,6 +54,17 @@ const ChatwithClient = ({ route }) => {
       },
     });
   }, []);
+  const backAction = () => {
+    // const popAction = StackActions.pop(1);
+    // navigation.goBack();
+    navigation.navigate("UserNav");
+    return true;
+  };
+
+  const backHandler = BackHandler.addEventListener(
+    "hardwareBackPress",
+    backAction
+  );
 
   const [fileSet, setFile] = useState(false);
   const [chatRoomId, setChatRoomId] = useState(_id); // chatrrom id
@@ -68,11 +79,7 @@ const ChatwithClient = ({ route }) => {
   const [chatLoader, setChatload] = useState(false);
 
   const [userMsg, setUserMsg] = useState("");
-  const [userAttachment, setUserAtachment] = useState({
-    uri: "",
-    name: "",
-    type: "",
-  });
+  const [userAttachment, setUserAtachment] = useState("");
 
   const getMyChatwithClient = async () => {
     const headers = { headers: { Authorization: `Bearer ${userToken}` } };
@@ -134,16 +141,13 @@ const ChatwithClient = ({ route }) => {
     const fd = new FormData();
 
     fd.append("clientId", clientId);
-    fd.append("userAttachment", userAttachment);
+    fd.append("attachment", {
+      uri: userAttachment,
+      name: new Date() + "_userAttachment",
+      type: "image/jpeg",
+    });
 
-    const headers = {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-        "Content-Type": "multipart/form-data",
-      },
-    };
-
-    const response = await postUserAttachment({ fd, headers });
+    const response = await postUserAttachment({ fd, userToken });
 
     const { newMessage, error } = response;
     console.log("error: ", error);
@@ -160,39 +164,67 @@ const ChatwithClient = ({ route }) => {
     setFile(false);
   };
 
-  const uploadDoc = async () => {
-    try {
-      const file = await DocumentPicker.getDocumentAsync();
-      console.log("file: ", file);
-      const { type, uri, mimeType } = file;
+  // const uploadDoc = async () => {
+  //   try {
+  //     const file = await DocumentPicker.getDocumentAsync();
+  //     console.log("file: ", file);
+  //     const { type, uri, mimeType } = file;
 
-      if (type === "success") {
+  //     if (type === "success") {
+  //       ToastAndroid.show(
+  //         `Attachment was selecetd!`,
+  //         ToastAndroid.SHORT,
+  //         ToastAndroid.BOTTOM
+  //       );
+
+  //       setUserAtachment({
+  //         uri,
+  //         name: new Date() + "_userAttachment",
+  //         type: "image/jpg",
+  //       });
+  //       setFile(true);
+  //     } else {
+  //       ToastAndroid.show(
+  //         `file selection was canceled!`,
+  //         ToastAndroid.SHORT,
+  //         ToastAndroid.BOTTOM
+  //       );
+  //     }
+  //   } catch (e) {
+  //     console.log("e: ", e);
+  //     ToastAndroid.show(
+  //       `something went wrong file choosing!`,
+  //       ToastAndroid.SHORT,
+  //       ToastAndroid.BOTTOM
+  //     );
+  //   }
+  // };
+
+  const uploadDoc = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      alert("sorry , we need camera roll permission to make this work");
+    }
+
+    if (status === "granted") {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+      });
+
+      console.log("result: ", result);
+
+      if (!result.canceled) {
         ToastAndroid.show(
           `Attachment was selecetd!`,
           ToastAndroid.SHORT,
           ToastAndroid.BOTTOM
         );
-
-        setUserAtachment({
-          uri,
-          name: new Date() + "_userAttachment",
-          type: "image/jpg",
-        });
+        setUserAtachment(result.uri);
         setFile(true);
-      } else {
-        ToastAndroid.show(
-          `file selection was canceled!`,
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM
-        );
+        console.log("result.assets: ", result.uri);
       }
-    } catch (e) {
-      console.log("e: ", e);
-      ToastAndroid.show(
-        `something went wrong file choosing!`,
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM
-      );
     }
   };
 

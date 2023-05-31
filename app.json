@@ -24,10 +24,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./images/Taskifylogo.png",
         "backgroundColor": "#E90064"
-      }
+      },
+      "package": "Taskify.apk"
     },
     "web": {
       "favicon": "./images/Taskifylogo.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "cff5ab01-51b0-47c6-b6bb-9214d522bd5b"
+      }
     }
   }
 }

@@ -65,6 +65,7 @@ import ViewUser from "./components/client/ViewUser";
 import ChatwithClient from "./components/user/ChatwithClient";
 import ChatWithUser from "./components/client/ChatwithUser";
 import ClientBid from "./components/client/ClientBid";
+import FunctionalPageClient from "./components/client/FunctionalPageClient";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -477,6 +478,13 @@ const MainApp = () => {
 
           <Stack.Screen name="ChatWithUser" component={ChatWithUser} />
           <Stack.Screen name="ClientBid" component={ClientBid} />
+          <Stack.Screen
+            name="FunctionalPageClient"
+            component={FunctionalPageClient}
+            options={{
+              animation: "slide_from_right",
+            }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     );

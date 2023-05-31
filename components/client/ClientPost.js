@@ -17,6 +17,7 @@ import {
   ToastAndroid,
   ActivityIndicator,
   KeyboardAvoidingView,
+  RefreshControl,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -33,11 +34,13 @@ import {
 import {
   deleteAssignmentServices,
   getAllAssingmentServices,
+  getClientAssigments,
   postAssignmentsServices,
 } from "../../services/oneForAll";
+import * as ImagePicker from "expo-image-picker";
+
 const ClientPost = () => {
   const navigation = useNavigation();
-  const [showPwd, setShowPwd] = useState(true);
   const [addAssignment, setAddAssignment] = useState({
     assignmentName: "",
     assignmentBudget: null,
@@ -45,9 +48,7 @@ const ClientPost = () => {
     description: "",
   });
 
-  const [Img, setImg] = useState({
-    attachments: [],
-  });
+  const [attachment, setAttachment] = useState("");
 
   const inputData = (value, name) => {
     setAddAssignment({ ...addAssignment, [name]: value });
@@ -55,27 +56,32 @@ const ClientPost = () => {
   const [assignments, setAssignments] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [loader, setLoader] = useState(false);
+
+  const _id = useSelector((state) => state.client)._id;
   const token = useSelector((state) => state.client).token;
 
-  //add img
-  const inputImg = () => {
-    // setImg({attachments:e.target.files});
-    setImg({
-      attachments:
-        "http://localhost:4300/clientAttachments/attachments_1678770505806.jpg",
-    });
-  };
+  const handleDocumentSelection = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-  const handleDocumentSelection = useCallback(async () => {
-    try {
-      const response = await DocumentPicker.pick({
-        presentationStyle: "fullScreen",
-      });
-      setFileResponse(response);
-    } catch (err) {
-      console.warn(err);
+    if (status !== "granted") {
+      alert("sorry , we need camera roll permission to make this work");
     }
-  }, []);
+
+    if (status === "granted") {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+      });
+
+      console.log("result: ", result);
+
+      if (!result.canceled) {
+        const imgSet = result.uri;
+        setAttachment(result.uri);
+        console.log("result.assets: ", result.uri);
+      }
+    }
+  };
 
   useEffect(() => {
     getAssignments();
@@ -89,51 +95,44 @@ const ClientPost = () => {
 
   const getAssignments = async () => {
     setLoader(true);
-    setRefresh(true);
-    const data = await getAllAssingmentServices();
 
-    const { theData, error } = data;
-    console.log("theData: ", theData);
+    const headers = { headers: { Authorization: `Bearer ${token}` } };
 
-    error && theData === undefined
+    const data = await getClientAssigments({ _id, headers });
+
+    const { myAssignments, error } = data;
+    console.log("myAssignments: ", myAssignments);
+
+    error && myAssignments === undefined
       ? ToastAndroid.show(`${error}`, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
       : "";
 
-    theData ? setLoader(false) : setLoader(true), setRefresh(false);
+    myAssignments ? setLoader(false) : setLoader(false), setRefresh(false);
 
-    theData ? setAssignments(theData) : [];
+    myAssignments ? setAssignments(myAssignments) : [];
   };
 
   const postAssignments = async () => {
     setLoader(true);
     try {
-      const { assignmentName, assignmentType, assignmentBudget, description } =
-        addAssignment;
-      // const {attachments}=Img;
-      attachments = `http://localhost:4300/clientAttachments/attachments_1678770505806.jpg`;
-      const data = {
-        assignmentName,
-        assignmentType,
-        assignmentBudget,
-        description,
-        attachments,
-      };
-      console.log("Data", data);
-
       const fd = new FormData();
-      fd.append("assignmentName", assignmentName);
-      fd.append("assignmentType", assignmentType);
-      fd.append("assignmentBudget", assignmentBudget);
-      fd.append("description", description);
-      fd.append("attachments", attachments);
-      //   for(const key of Object.keys(attachments)){
-      //     fd.append("attachments",attachments[key]);
-      // }
-      // const headers = { headers: { Authorization: `Bearer ${token}` } };
+      fd.append("assignmentName", addAssignment.assignmentName);
+      fd.append("assignmentType", addAssignment.assignmentType);
+      fd.append("assignmentBudget", addAssignment.assignmentBudget);
+      fd.append("description", addAssignment.description);
+      fd.append("attachments", {
+        uri: attachment,
+        name: new Date() + "_attachments",
+        type: "image/jpg",
+      });
+      console.log("attachment: ", attachment);
+
+      console.log("fd: ", fd);
+
       const result = await postAssignmentsServices({ fd, token });
-      console.log("Result", result);
+
+      console.log("Result", result.data);
       if (result) {
-        setLoader(false);
         ToastAndroid.show(
           `Task added Successfull!`,
           ToastAndroid.SHORT,
@@ -145,13 +144,15 @@ const ClientPost = () => {
           assignmentBudget: "",
           description: "",
         });
+        setAttachment("");
+        getAssignments();
       } else if (error) {
+        setLoader(false);
         ToastAndroid.show(
           `${error.message}`,
           ToastAndroid.SHORT,
           ToastAndroid.BOTTOM
         );
-        setLoader(false);
       }
     } catch (error) {
       console.log("errors: ", error.response);
@@ -159,25 +160,50 @@ const ClientPost = () => {
   };
 
   const deleteAssignment = async (item) => {
-    setLoader(true);
-    try {
-      const { _id } = item;
-      console.log("_id", _id);
-      const headers = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await deleteAssignmentServices(headers, _id);
-      // console.log("response",response);
-      if (response) setLoader(false);
-      getAssignments();
-    } catch (error) {
-      console.log("error: ", error);
+    const onClickOk = async () => {
+      setLoader(true);
+      try {
+        const { _id } = item;
+        console.log("_id", _id);
+        const headers = { headers: { Authorization: `Bearer ${token}` } };
+        const response = await deleteAssignmentServices(headers, _id);
+        // console.log("response",response);
+        if (response) getAssignments();
+      } catch (error) {
+        console.log("error: ", error);
 
-      return { error };
-    }
-    getAssignments();
+        return { error };
+      }
+    };
+
+    Alert.alert(
+      "Delete Task",
+      "Are you sure , you want to delete this Task ?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => null,
+          style: "cancel",
+        },
+        {
+          text: "Ok",
+          onPress: () => onClickOk(),
+        },
+      ]
+    );
   };
 
+  let notdone = 0;
+
   return (
-    <KeyboardAwareScrollView>
+    <KeyboardAwareScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={refresh}
+          onRefresh={() => getAssignments()}
+        />
+      }
+    >
       <SafeAreaView>
         <View
           style={{
@@ -215,6 +241,7 @@ const ClientPost = () => {
               marginTop: 20,
             }}
             onChangeText={(text) => inputData(text, "assignmentName")}
+            value={addAssignment.assignmentName}
           ></TextInput>
 
           <TextInput
@@ -229,6 +256,7 @@ const ClientPost = () => {
               backgroundColor: "white",
             }}
             onChangeText={(text) => inputData(text, "assignmentType")}
+            value={addAssignment.assignmentType}
           ></TextInput>
 
           <TextInput
@@ -244,6 +272,7 @@ const ClientPost = () => {
               backgroundColor: "white",
             }}
             onChangeText={(text) => inputData(text, "description")}
+            value={addAssignment.description}
           ></TextInput>
 
           <TextInput
@@ -259,17 +288,17 @@ const ClientPost = () => {
               backgroundColor: "white",
             }}
             onChangeText={(text) => inputData(text, "assignmentBudget")}
+            value={addAssignment.assignmentBudget}
           ></TextInput>
-          <TouchableOpacity
-            onPress={handleDocumentSelection}
-            onChangeText={inputImg}
-          >
+          <TouchableOpacity onPress={handleDocumentSelection}>
             <View
               style={{
                 backgroundColor: "white",
-                width: 250,
-                borderRadius: 8,
+                width: 200,
+                borderRadius: 5,
                 height: 50,
+                flexDirection: "row",
+                justifyContent: "space-around",
                 alignItems: "center",
                 padding: 10,
                 marginTop: 10,
@@ -277,25 +306,24 @@ const ClientPost = () => {
                 marginRight: "auto",
               }}
             >
-              <Text style={{ marginTop: 5, fontSize: 18 }}>
-                Enter Attachments{" "}
-              </Text>
-              <Text style={{ marginLeft: 190, marginTop: -25, fontSize: 18 }}>
-                <ArrowUpOnSquareStackIcon style={{ color: "black" }} />
-              </Text>
+              <Text style={{ marginTop: 5, fontSize: 18 }}>Attachments</Text>
+              <ArrowUpOnSquareStackIcon style={{ color: "black" }} />
             </View>
           </TouchableOpacity>
+          <Text style={{ textAlign: "center", color: "white" }}>
+            Add images only!
+          </Text>
 
           <TouchableOpacity
             style={{
               backgroundColor: "white",
-              width: 150,
+              width: 100,
               height: 45,
               alignItems: "center",
-              borderRadius: 20,
+              borderRadius: 5,
               marginLeft: "auto",
               marginRight: "auto",
-              marginTop: 30,
+              marginTop: 20,
             }}
             onPress={postAssignments}
           >
@@ -306,7 +334,7 @@ const ClientPost = () => {
                 marginTop: 10,
               }}
             >
-              Add Assignment
+              Add Task
             </Text>
           </TouchableOpacity>
         </View>
@@ -345,76 +373,188 @@ const ClientPost = () => {
           // all the assignments
 
           <View style={{ marginBottom: 160 }}>
-            {assignments.map((item, index) => {
-              return (
-                <View
-                  key={index}
-                  style={{
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
-                    marginTop: 25,
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("ClientBid", {
-                        assignment: item,
-                      })
-                    }
-                  >
+            {assignments.length !== 0 ? (
+              assignments.map((item, index) => {
+                console.log("item: ", item);
+                if (item.assignmentStatus === "pending") {
+                  return (
                     <View
+                      key={index}
                       style={{
-                        flexDirection: "row",
-                        width: 350,
-                        height: 80,
-                        backgroundColor: "white",
-                        justifyContent: "space-around",
+                        justifyContent: "space-evenly",
                         alignItems: "center",
-                        borderRadius: 5,
-                        shadowColor: "#748c94",
-                        elevation: 10,
-
-                        // marginTop: 10,
-                        marginBottom: 17,
+                        marginTop: 25,
                       }}
                     >
-                      <View style={{ width: 150 }}>
-                        <Text style={{ fontWeight: "500" }}>
-                          {item.assignmentName}
-                        </Text>
-                        <Text style={{ fontWeight: "500" }}>
-                          {item.assignmentType}
-                        </Text>
-                      </View>
-
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
+                      <TouchableOpacity
+                        onPress={() =>
+                          navigation.navigate("ClientBid", {
+                            assignment: item,
+                          })
+                        }
                       >
-                        <CurrencyRupeeIcon
-                          color={"#E90064"}
-                          height={25}
-                          width={25}
-                        />
-                        <Text
+                        <View
                           style={{
-                            fontWeight: "500",
+                            flexDirection: "row",
+                            width: 350,
+                            minHeight: 90,
+                            maxHeight: "auto",
+                            padding: 10,
+                            backgroundColor: "white",
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            borderRadius: 5,
+                            shadowColor: "#748c94",
+                            elevation: 10,
+                            marginTop: 10,
                           }}
                         >
-                          {item.assignmentBudget}
-                        </Text>
-                      </View>
-                      <PencilSquareIcon
-                        style={{ color: "black" }}
-                      ></PencilSquareIcon>
-                      <TrashIcon
-                        style={{ color: "black" }}
-                        onPress={() => deleteAssignment(item)}
-                      ></TrashIcon>
+                          <View
+                            style={{
+                              width: 150,
+                              padding: 10,
+                            }}
+                          >
+                            <Text style={{ fontWeight: "500" }}>
+                              {item.assignmentName}
+                            </Text>
+                            <Text style={{ fontWeight: "500" }}>
+                              {item.assignmentType}
+                            </Text>
+                            {item.assignmentStatus === "pending" ? (
+                              <Text style={{ fontWeight: "500", color: "red" }}>
+                                pending*
+                              </Text>
+                            ) : (
+                              <Text
+                                style={{ fontWeight: "500", color: "green" }}
+                              >
+                                completed*
+                              </Text>
+                            )}
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <CurrencyRupeeIcon
+                              color={"#E90064"}
+                              height={25}
+                              width={25}
+                            />
+                            <Text
+                              style={{
+                                fontWeight: "500",
+                              }}
+                            >
+                              {item.assignmentBudget}
+                            </Text>
+                          </View>
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: "#E90064",
+                              height: 40,
+                              width: 40,
+                              borderRadius: 4,
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                            }}
+                          >
+                            <PencilSquareIcon
+                              size={27}
+                              color={"white"}
+                            ></PencilSquareIcon>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => deleteAssignment(item)}
+                            style={{
+                              backgroundColor: "#E90064",
+                              height: 40,
+                              width: 40,
+                              borderRadius: 4,
+                              justifyContent: "space-around",
+                              alignItems: "center",
+                            }}
+                          >
+                            <TrashIcon
+                              size={27}
+                              style={{ color: "white" }}
+                            ></TrashIcon>
+                          </TouchableOpacity>
+                        </View>
+                      </TouchableOpacity>
                     </View>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
+                  );
+                } else {
+                  notdone = notdone + 1;
+                }
+
+                if (assignments.length === notdone) {
+                  console.log("notdone: ", notdone);
+                  console.log("assignments.length: ", assignments.length);
+
+                  return (
+                    <View
+                      style={{
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        marginTop: 40,
+                      }}
+                      key={index}
+                    >
+                      <Text
+                        style={{
+                          color: "grey",
+                          fontSize: 17,
+                          fontWeight: "500",
+                        }}
+                      >
+                        uploaded tasks have already been done!
+                      </Text>
+                      <Text
+                        style={{
+                          color: "grey",
+                          fontSize: 17,
+                          fontWeight: "500",
+                        }}
+                      >
+                        Please add some more tasks
+                      </Text>
+                    </View>
+                  );
+                }
+              })
+            ) : (
+              <View
+                style={{
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  marginTop: 40,
+                }}
+              >
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  No tasks uploaded yet!
+                </Text>
+                <Text
+                  style={{
+                    color: "grey",
+                    fontSize: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  upload some tasks and get your work done
+                </Text>
+              </View>
+            )}
           </View>
         )}
       </SafeAreaView>
